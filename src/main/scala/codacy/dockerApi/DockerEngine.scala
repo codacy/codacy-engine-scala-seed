@@ -11,7 +11,10 @@ abstract class DockerEngine(Tool: Tool) {
     spec.flatMap { implicit spec =>
       config.flatMap { case maybeConfig =>
         //search for our config
-        val maybePatterns = maybeConfig.flatMap(_.tools.collectFirst { case config if config.name == spec.name => config.patterns })
+        val maybePatterns = maybeConfig.flatMap(_.tools.collectFirst { case config if config.name == spec.name =>
+          val allPatternIds = spec.patterns.map(_.patternId)
+          config.patterns.filter{ case pattern => allPatternIds.contains(pattern.patternId) }
+        })
         val maybeFiles = maybeConfig.flatMap(_.files.map(_.map { case path =>
           sourcePath.resolve(path.value)
         }))

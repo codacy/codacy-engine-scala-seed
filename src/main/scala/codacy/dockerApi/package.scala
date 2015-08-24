@@ -65,25 +65,25 @@ package object dockerApi {
 
   implicit def configReader(implicit spec:Spec): Reads[FullConfig] = {
     implicit val r1 = Json.reads[ParameterDef]
-    implicit val r0 = Json.reads[PatternDef].flatMap{ case pattern =>
+    implicit val r0 = Json.reads[PatternDef]/*.flatMap{ case pattern =>
 
       val filtered =
         if (spec.patterns.exists(_.patternId == pattern.patternId)) JsSuccess(pattern)
         else JsError(s"invalid patternId: ${pattern.patternId}")
 
       asReader(filtered)
-    }
+    }*/
 
     implicit val r2 = Reads.set(Json.reads[ToolConfig])
 
-    Json.reads[FullConfig].flatMap{ case fullCfg =>
+    Json.reads[FullConfig]/*.flatMap{ case fullCfg =>
       val ps = fullCfg.tools.collectFirst{ case tool if tool.name == spec.name =>
         if(tool.patterns.isEmpty) JsError("no patterns selected")
         else JsSuccess(fullCfg)
       }.getOrElse(JsError(s"no config for ${spec.name} found"))
 
       asReader(ps)
-    }
+    }*/
   }
 
   implicit lazy val writer: Writes[Result] = {
