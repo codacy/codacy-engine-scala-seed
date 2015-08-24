@@ -25,15 +25,17 @@ package dockerApi {
   final class ResultMessage (val value:String) extends AnyVal{ override def toString = value.toString }
   final class ResultLine    (val value:Int   ) extends AnyVal{ override def toString = value.toString }
   final class ToolName      (val value:String) extends AnyVal{ override def toString = value.toString }
-
+  final class ErrorMessage  (val value:String) extends AnyVal{ override def toString = value.toString }
   final class ParameterName (val value:String) extends AnyVal{ override def toString = value.toString }
+
   object PatternId     extends Formats[PatternId    , String]( new PatternId(_)     )
   object SourcePath    extends Formats[SourcePath   , String]( new SourcePath(_)    )
   object ResultMessage extends Formats[ResultMessage, String]( new ResultMessage(_) )
   object ResultLine    extends Formats[ResultLine   , Int   ]( new ResultLine(_)    )
   object ToolName      extends Formats[ToolName     , String]( new ToolName(_)      )
-
+  object ErrorMessage  extends Formats[ErrorMessage , String]( new ErrorMessage(_)  )
   object ParameterName extends Formats[ParameterName, String]( new ParameterName(_) )
+
   case class ParameterDef(name:ParameterName,value:JsValue)
   case class PatternDef(patternId: PatternId, parameters:Option[Set[ParameterDef]])
   case class ToolConfig(name:ToolName, patterns:Seq[PatternDef])
@@ -45,7 +47,9 @@ package dockerApi {
 
   case class Spec(name:ToolName,patterns:Set[PatternSpec])
 
-  case class Result(filename:SourcePath,message:ResultMessage,patternId:PatternId,line: ResultLine)
+  sealed trait Result
+  final case class Issue(filename:SourcePath, message:ResultMessage, patternId:PatternId, line: ResultLine) extends Result
+  final case class FileError(filename:SourcePath, message:Option[ErrorMessage]) extends Result
 }
 
 package object dockerApi {
@@ -82,5 +86,20 @@ package object dockerApi {
     }
   }
 
-  implicit lazy val writer: Writes[Result] = Json.writes[Result]
+  implicit lazy val writer: Writes[Result] = {
+    lazy val issueWrites = Json.writes[Issue]
+    lazy val errorWrites = Json.writes[FileError]
+
+    Writes[Result]{ (result:Result) =>
+      val base = result match{
+        case issue:Issue     => issueWrites.writes(issue)
+        case error:FileError => errorWrites.writes(error)
+      }
+
+      (base,result.getClass.getTypeName.split('.').lastOption) match{
+        case (o:JsObject,Some(tpe)) => o ++ Json.obj("type" -> tpe )
+        case other => base
+      }
+    }
+  }
 }
