@@ -1,9 +1,9 @@
 package codacy.dockerApi
 
+import codacy.dockerApi.DockerEnvironment._
 import play.api.libs.json.Json
 
 import scala.util.{Failure, Success}
-import DockerEnvironment._
 
 abstract class DockerEngine(Tool: Tool) {
 
@@ -13,7 +13,7 @@ abstract class DockerEngine(Tool: Tool) {
         //search for our config
         val maybePatterns = maybeConfig.flatMap(_.tools.collectFirst { case config if config.name == spec.name =>
           val allPatternIds = spec.patterns.map(_.patternId)
-          config.patterns.filter{ case pattern => allPatternIds.contains(pattern.patternId) }
+          config.patterns.filter { case pattern => allPatternIds.contains(pattern.patternId) }
         })
         val maybeFiles = maybeConfig.flatMap(_.files.map(_.map { case path =>
           sourcePath.resolve(path.value)
@@ -27,7 +27,7 @@ abstract class DockerEngine(Tool: Tool) {
       }
     } match {
       case Success(results) =>
-        results.map{ case result =>
+        results.map { case result =>
           println(Json.stringify(Json.toJson(result)))
         }.toList
 

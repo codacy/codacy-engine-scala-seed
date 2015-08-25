@@ -1,6 +1,7 @@
 package codacy.dockerApi
 
 import java.nio.file.{Files, Paths}
+
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, Json}
 
