@@ -1,7 +1,7 @@
 package codacy.dockerApi
 
 import codacy.dockerApi.DockerEnvironment._
-import play.api.libs.json.Json
+import play.api.libs.json.{Writes, Format, Json}
 
 import scala.util.{Failure, Success}
 
@@ -27,13 +27,27 @@ abstract class DockerEngine(Tool: Tool) {
       }
     } match {
       case Success(results) =>
-        results.map { case result =>
-          println(Json.stringify(Json.toJson(result)))
-        }.toList
+        results.foreach {
+          case issue: Issue =>
+            val relativeIssue = issue.copy(filename = SourcePath(relativize(issue.filename.value)))
+            logResult(relativeIssue)
+          case error: FileError =>
+            val relativeIssue = error.copy(filename = SourcePath(relativize(error.filename.value)))
+            logResult(relativeIssue)
+        }
 
       case Failure(error) =>
         error.printStackTrace(Console.err)
         System.exit(1)
     }
   }
+
+  private def relativize(path: String) = {
+    path.stripPrefix(DockerEnvironment.sourcePath.toString)
+  }
+
+  private def logResult[T](result: T)(implicit fmt: Writes[T]) = {
+    println(Json.stringify(Json.toJson(result)))
+  }
+
 }
