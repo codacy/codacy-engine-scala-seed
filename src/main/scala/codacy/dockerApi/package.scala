@@ -2,7 +2,7 @@ package codacy
 
 import java.nio.file.Path
 
-import play.api.libs.json._
+import play.api.libs.json.{JsValue, Reads, Writes, _}
 
 import scala.language.reflectiveCalls
 import scala.util.Try
@@ -73,7 +73,7 @@ case class PatternDef(patternId: PatternId, parameters: Option[Set[ParameterDef]
 
 case class ToolConfig(name: ToolName, patterns: Seq[PatternDef])
 
-private[dockerApi] case class FullConfig(tools: Set[ToolConfig], files: Option[Set[SourcePath]])
+case class FullConfig(tools: Set[ToolConfig], files: Option[Set[SourcePath]])
 
 //there are other fields like name and description but i don't care about them inside the tool
 case class ParameterSpec(name: ParameterName, default: JsValue)
@@ -92,8 +92,6 @@ final case class FileError(filename: SourcePath, message: Option[ErrorMessage]) 
 
 package object dockerApi {
 
-  private[this] def asReader[A](jsResult: JsResult[A]): Reads[A] = Reads[A]((_: JsValue) => jsResult)
-
   implicit def toValue[A] = (a: AnyVal {def value: A}) => a.value
 
   implicit lazy val specReader: Reads[Spec] = {
@@ -104,25 +102,11 @@ package object dockerApi {
 
   implicit def configReader(implicit spec: Spec): Reads[FullConfig] = {
     implicit val r1 = Json.reads[ParameterDef]
-    implicit val r0 = Json.reads[PatternDef] /*.flatMap{ case pattern =>
-
-      val filtered =
-        if (spec.patterns.exists(_.patternId == pattern.patternId)) JsSuccess(pattern)
-        else JsError(s"invalid patternId: ${pattern.patternId}")
-
-      asReader(filtered)
-    }*/
+    implicit val r0 = Json.reads[PatternDef]
 
     implicit val r2 = Reads.set(Json.reads[ToolConfig])
 
-    Json.reads[FullConfig] /*.flatMap{ case fullCfg =>
-      val ps = fullCfg.tools.collectFirst{ case tool if tool.name == spec.name =>
-        if(tool.patterns.isEmpty) JsError("no patterns selected")
-        else JsSuccess(fullCfg)
-      }.getOrElse(JsError(s"no config for ${spec.name} found"))
-
-      asReader(ps)
-    }*/
+    Json.reads[FullConfig]
   }
 
   implicit lazy val writer: Writes[Result] = {

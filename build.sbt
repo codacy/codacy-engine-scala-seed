@@ -1,8 +1,8 @@
-resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/"
-
 name := """codacy-engine-scala-seed"""
 
-version := "1.1.0"
+organization := "com.codacy"
+
+version := "1.3.0"
 
 scalaVersion := "2.10.5"
 
@@ -10,11 +10,9 @@ crossScalaVersions := Seq("2.10.5", "2.11.7")
 
 scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Ywarn-adapted-args", "-Xlint", "-Xfatal-warnings")
 
-organization := "com.codacy"
+resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-releases/"
 
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.8"
-
-organization := "com.codacy"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.10"
 
 organizationName := "Codacy"
 
@@ -24,7 +22,7 @@ publishMavenStyle := true
 
 publishArtifact in Test := false
 
-pomIncludeRepository := { _ => false}
+pomIncludeRepository := { _ => false }
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"

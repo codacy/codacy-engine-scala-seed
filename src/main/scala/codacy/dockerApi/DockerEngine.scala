@@ -1,7 +1,7 @@
 package codacy.dockerApi
 
 import codacy.dockerApi.DockerEnvironment._
-import play.api.libs.json.{Writes, Format, Json}
+import play.api.libs.json.{Json, Writes}
 
 import scala.util.{Failure, Success}
 
