@@ -43,7 +43,7 @@ abstract class DockerEngine(Tool: Tool) {
   }
 
   private def relativize(path: String) = {
-    path.stripPrefix(DockerEnvironment.sourcePath.toString)
+    path.stripPrefix(DockerEnvironment.sourcePath.toString).stripPrefix("/")
   }
 
   private def logResult[T](result: T)(implicit fmt: Writes[T]) = {
