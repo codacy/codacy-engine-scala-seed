@@ -2,7 +2,7 @@ name := """codacy-engine-scala-seed"""
 
 organization := "com.codacy"
 
-version := "1.4.0"
+version := "1.5.0"
 
 scalaVersion := "2.10.5"
 
