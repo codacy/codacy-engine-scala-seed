@@ -14,7 +14,7 @@ among many others.
 
 ### Usage
 
-Import on SBT:
+Add to your SBT dependencies:
 
 ```
 "com.codacy" %% "codacy-engine-scala-seed" % "1.4.0"
