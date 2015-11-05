@@ -52,12 +52,10 @@ class FileHelperTest extends FlatSpec with Matchers {
   }
 
   "FileHelper" should "createFile" in {
-    val pathString: String = "filename.ext"
+    val pathString: String = "/tmp/fileHelperFilename.ext"
+    new java.io.File(pathString).delete()
 
     val file = FileHelper.createFile(pathString, "foo").toString
-
     io.Source.fromFile(file).mkString should be("foo")
-
-    new java.io.File(file).delete()
   }
 }
