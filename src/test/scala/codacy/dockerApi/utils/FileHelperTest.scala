@@ -18,6 +18,17 @@ class FileHelperTest extends FlatSpec with Matchers {
     result2 should be("filename.ext")
   }
 
+  "FileHelper" should "stripPath with no common prefix" in {
+    val pathString: String = "filename.ext"
+    val pathString2: String = "c/d/filename.ext"
+
+    val result: String = FileHelper.stripPath(pathString, "/a/b/")
+    result should be(pathString)
+
+    val result2: String = FileHelper.stripPath(pathString2, "/a/b/")
+    result2 should be(pathString2)
+  }
+
   "FileHelper" should "stripPath from Path" in {
     val path: java.nio.file.Path = java.nio.file.Paths.get("a/b/c/filename.ext")
     val pathPrefix: java.nio.file.Path = java.nio.file.Paths.get("a/b")
@@ -30,5 +41,23 @@ class FileHelperTest extends FlatSpec with Matchers {
 
     val result2: String = FileHelper.stripPath(path2, pathPrefix2)
     result2 should be("filename.ext")
+  }
+
+  "FileHelper" should "createTmpFile" in {
+    val fileTmp = FileHelper.createTmpFile("foo", "prefix", ".ext").toString
+
+    java.nio.file.Paths.get(fileTmp).getFileName.toString should startWith ("prefix")
+    fileTmp should endWith (".ext")
+    io.Source.fromFile(fileTmp).mkString should be("foo")
+  }
+
+  "FileHelper" should "createFile" in {
+    val pathString: String = "filename.ext"
+
+    val file = FileHelper.createFile(pathString, "foo").toString
+
+    io.Source.fromFile(file).mkString should be("foo")
+
+    new java.io.File(file).delete()
   }
 }
