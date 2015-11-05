@@ -28,7 +28,7 @@ object FileHelper {
 
   def stripPath(filename: String, prefix: String): String = {
 
-    val FilenameRegex = s""".*$prefix/(.*)""".r
+    val FilenameRegex = s""".*$prefix/*(.*)""".r
 
     filename match {
       case FilenameRegex(res) => res;
