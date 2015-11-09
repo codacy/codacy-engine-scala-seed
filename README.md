@@ -19,7 +19,7 @@ Add to your SBT dependencies:
 "com.codacy" %% "codacy-engine-scala-seed" % "1.4.0"
 ```
 
-You shouldn't the library itself, we use it as a core in our tools,
+You shouldn't worry about the library itself, we use it as a core in our tools,
 and everything is well explained in our Docs section.
 
 ## Docs
