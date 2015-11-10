@@ -19,15 +19,18 @@ object CommandRunner {
 
     val pio = new ProcessIO(_.close(), readStream(stdout), readStream(stderr))
 
-    val process = Process(cmd, dir).run(pio)
-    val result = Try(process.exitValue())
+    Try(Process(cmd, dir).run(pio)) match {
+      case Success(process) =>
+        Try(process.exitValue()) match {
+          case Success(exitValue) =>
+            Right(CommandResult(exitValue, stdout, stderr))
 
-    result match {
-      case Success(exitValue) =>
-        Right(CommandResult(exitValue, stdout, stderr))
+          case Failure(e) =>
+            process.destroy()
+            Left(e)
+        }
 
       case Failure(e) =>
-        process.destroy()
         Left(e)
     }
   }
