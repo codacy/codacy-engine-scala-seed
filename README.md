@@ -16,7 +16,7 @@ For more details and examples of tools that use this project, you can check
 Add to your SBT dependencies:
 
 ```
-"com.codacy" %% "codacy-engine-scala-seed" % "1.4.0"
+"com.codacy" %% "codacy-engine-scala-seed" % "2.6.12"
 ```
 
 You shouldn't worry about the library itself, we use it as a core in our tools,
