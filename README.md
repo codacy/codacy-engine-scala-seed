@@ -1,5 +1,4 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/bc3a79d1b12649158a1eb4758e872141)](https://www.codacy.com/app/Codacy/codacy-engine-scala-seed)
-[![Codacy Badge](https://api.codacy.com/project/badge/coverage/bc3a79d1b12649158a1eb4758e872141)](https://www.codacy.com/app/Codacy/codacy-engine-scala-seed)
 [![Build Status](https://circleci.com/gh/codacy/codacy-engine-scala-seed.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/codacy-engine-scala-seed)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.codacy/codacy-engine-scala-seed_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.codacy/codacy-engine-scala-seed_2.11)
 
