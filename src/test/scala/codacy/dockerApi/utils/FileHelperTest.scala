@@ -46,16 +46,8 @@ class FileHelperTest extends FlatSpec with Matchers {
   "FileHelper" should "createTmpFile" in {
     val fileTmp = FileHelper.createTmpFile("foo", "prefix", ".ext").toString
 
-    java.nio.file.Paths.get(fileTmp).getFileName.toString should startWith ("prefix")
-    fileTmp should endWith (".ext")
+    java.nio.file.Paths.get(fileTmp).getFileName.toString should startWith("prefix")
+    fileTmp should endWith(".ext")
     io.Source.fromFile(fileTmp).mkString should be("foo")
-  }
-
-  "FileHelper" should "createFile" in {
-    val pathString: String = "/tmp/fileHelperFilename.ext"
-    new java.io.File(pathString).delete()
-
-    val file = FileHelper.createFile(pathString, "foo").toString
-    io.Source.fromFile(file).mkString should be("foo")
   }
 }
