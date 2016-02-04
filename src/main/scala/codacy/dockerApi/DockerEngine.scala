@@ -1,13 +1,39 @@
 package codacy.dockerApi
 
+import akka.actor.ActorSystem
 import codacy.dockerApi.DockerEnvironment._
 import play.api.libs.json.{Json, Writes}
 
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
 
 abstract class DockerEngine(Tool: Tool) {
 
+  lazy val sys = ActorSystem("timeoutSystem")
+
+  def initTimeout(duration: FiniteDuration) = {
+    implicit val ct: ExecutionContext = sys.dispatcher
+    sys.scheduler.scheduleOnce(duration){
+      Runtime.getRuntime().halt(2)
+    }
+  }
+
+  lazy val timeout = Option(System.getProperty("timeout")).flatMap{ case rawDuration =>
+    Try(Duration(rawDuration)).toOption.collect{ case d:FiniteDuration => d }
+  }.getOrElse(30.minutes)
+
+  lazy val isDebug = Option(System.getProperty("debug")).flatMap{ case rawDebug =>
+    Try(rawDebug.toBoolean).toOption
+  }.getOrElse(false)
+
+  def log(message:String):Unit = if(isDebug){
+    Console.err.print(s"[DockerEngine] $message")
+  }
+
   def main(args: Array[String]): Unit = {
+    initTimeout(timeout)
+
     spec.flatMap { implicit spec =>
       config.flatMap { case maybeConfig =>
         //search for our config
@@ -19,6 +45,7 @@ abstract class DockerEngine(Tool: Tool) {
           sourcePath.resolve(path.value)
         }))
 
+        log("tool started")
         Tool(
           path = sourcePath,
           conf = maybePatterns,
@@ -27,6 +54,7 @@ abstract class DockerEngine(Tool: Tool) {
       }
     } match {
       case Success(results) =>
+        log("receiving results")
         results.foreach {
           case issue: Issue =>
             val relativeIssue = issue.copy(filename = SourcePath(relativize(issue.filename.value)))
@@ -35,7 +63,7 @@ abstract class DockerEngine(Tool: Tool) {
             val relativeIssue = error.copy(filename = SourcePath(relativize(error.filename.value)))
             logResult(relativeIssue)
         }
-
+        log("tool finished")
       case Failure(error) =>
         error.printStackTrace(Console.err)
         System.exit(1)
