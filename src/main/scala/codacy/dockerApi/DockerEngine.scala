@@ -23,8 +23,8 @@ abstract class DockerEngine(Tool: Tool) {
     Try(Duration(rawDuration)).toOption.collect{ case d:FiniteDuration => d }
   }.getOrElse(30.minutes)
 
-  lazy val isDebug = Option(System.getProperty("debug")).flatMap{ case rawDuration =>
-    Try(rawDuration.toBoolean).toOption
+  lazy val isDebug = Option(System.getProperty("debug")).flatMap{ case rawDebug =>
+    Try(rawDebug.toBoolean).toOption
   }.getOrElse(false)
 
   def log(message:String):Unit = if(isDebug){
