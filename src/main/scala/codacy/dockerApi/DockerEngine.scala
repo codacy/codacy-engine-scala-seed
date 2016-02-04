@@ -15,13 +15,21 @@ abstract class DockerEngine(Tool: Tool) {
   def initTimeout(duration: FiniteDuration) = {
     implicit val ct: ExecutionContext = sys.dispatcher
     sys.scheduler.scheduleOnce(duration){
-      Runtime.getRuntime().halt(1)
+      Runtime.getRuntime().halt(2)
     }
   }
 
   lazy val timeout = Option(System.getProperty("timeout")).flatMap{ case rawDuration =>
     Try(Duration(rawDuration)).toOption.collect{ case d:FiniteDuration => d }
   }.getOrElse(30.minutes)
+
+  lazy val isDebug = Option(System.getProperty("debug")).flatMap{ case rawDuration =>
+    Try(rawDuration.toBoolean).toOption
+  }.getOrElse(false)
+
+  def log(message:String):Unit = if(isDebug){
+    Console.err.print(s"[DockerEngine] $message")
+  }
 
   def main(args: Array[String]): Unit = {
     initTimeout(timeout)
@@ -37,6 +45,7 @@ abstract class DockerEngine(Tool: Tool) {
           sourcePath.resolve(path.value)
         }))
 
+        log("tool started")
         Tool(
           path = sourcePath,
           conf = maybePatterns,
@@ -45,6 +54,7 @@ abstract class DockerEngine(Tool: Tool) {
       }
     } match {
       case Success(results) =>
+        log("receiving results")
         results.foreach {
           case issue: Issue =>
             val relativeIssue = issue.copy(filename = SourcePath(relativize(issue.filename.value)))
@@ -53,7 +63,7 @@ abstract class DockerEngine(Tool: Tool) {
             val relativeIssue = error.copy(filename = SourcePath(relativize(error.filename.value)))
             logResult(relativeIssue)
         }
-
+        log("tool finished")
       case Failure(error) =>
         error.printStackTrace(Console.err)
         System.exit(1)
