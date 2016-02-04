@@ -1,13 +1,31 @@
 package codacy.dockerApi
 
+import akka.actor.ActorSystem
 import codacy.dockerApi.DockerEnvironment._
 import play.api.libs.json.{Json, Writes}
 
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
 
 abstract class DockerEngine(Tool: Tool) {
 
+  lazy val sys = ActorSystem("timeoutSystem")
+
+  def initTimeout(duration: FiniteDuration) = {
+    implicit val ct: ExecutionContext = sys.dispatcher
+    sys.scheduler.scheduleOnce(duration){
+      Runtime.getRuntime().halt(1)
+    }
+  }
+
+  lazy val timeout = Option(System.getProperty("timeout")).flatMap{ case rawDuration =>
+    Try(Duration(rawDuration)).toOption.collect{ case d:FiniteDuration => d }
+  }.getOrElse(30.minutes)
+
   def main(args: Array[String]): Unit = {
+    initTimeout(timeout)
+
     spec.flatMap { implicit spec =>
       config.flatMap { case maybeConfig =>
         //search for our config

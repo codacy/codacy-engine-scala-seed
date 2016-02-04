@@ -13,8 +13,9 @@ scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Ywarn-adapted-a
 resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-releases/"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.10",
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+  "com.typesafe.play" %% "play-json"  % "2.3.10",
+  "org.scalatest"     %% "scalatest"  % "2.2.4" % "test",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.14"
 )
 
 organizationName := "Codacy"
