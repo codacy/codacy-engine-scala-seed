@@ -22,7 +22,7 @@ abstract class Formats[W <: AnyVal {val value : B}, B](apply_ : (B => W)) extend
 }
 
 trait Tool {
-  def apply(path: Path, conf: Option[Seq[PatternDef]], files: Option[Set[Path]])(implicit spec: Spec): Try[Iterable[Result]]
+  def apply(path: Path, conf: Option[List[PatternDef]], files: Option[Set[Path]])(implicit spec: Spec): Try[List[Result]]
 }
 
 final class PatternId(val value: String) extends AnyVal {
@@ -71,7 +71,7 @@ case class ParameterDef(name: ParameterName, value: JsValue)
 
 case class PatternDef(patternId: PatternId, parameters: Option[Set[ParameterDef]])
 
-case class ToolConfig(name: ToolName, patterns: Seq[PatternDef])
+case class ToolConfig(name: ToolName, patterns: List[PatternDef])
 
 case class FullConfig(tools: Set[ToolConfig], files: Option[Set[SourcePath]])
 

@@ -21,8 +21,8 @@ class ToolHelperTest extends FlatSpec with Matchers {
   val patternDef2NoParam = PatternDef(PatternId("id2"), None)
 
   val genericSpec = codacy.dockerApi.Spec(ToolName("tool1"), patternsSpec)
-  val genericConf: Option[Seq[PatternDef]] = Some(Seq(patternDef1, patternDef2))
-  val genericConfNoParam: Option[Seq[PatternDef]] = Some(Seq(patternDef1NoParam, patternDef2NoParam))
+  val genericConf: Option[List[PatternDef]] = Some(List(patternDef1, patternDef2))
+  val genericConfNoParam: Option[List[PatternDef]] = Some(List(patternDef1NoParam, patternDef2NoParam))
 
   "ToolHelper" should "getPatternsFromConf" in {
     val spec = genericSpec
@@ -44,11 +44,11 @@ class ToolHelperTest extends FlatSpec with Matchers {
 
   "ToolHelper" should "getPatternsEmptyIfEmptyConf" in {
     val spec = genericSpec
-    val conf: Option[Seq[PatternDef]] = Some(Seq())
+    val conf: Option[List[PatternDef]] = Some(List())
 
     val result = ToolHelper.getPatternsToLint(conf)(spec)
 
-    result should equal(Some(Seq()))
+    result should equal(Some(List()))
   }
 
   "ToolHelper" should "getParametersFromSpec" in {
@@ -59,7 +59,7 @@ class ToolHelperTest extends FlatSpec with Matchers {
     val expectedParamDef2 = ParameterDef(ParameterName("param2"), JsString("value2"))
     val expectedPatternDef1 = PatternDef(PatternId("id1"), Some(Set(expectedParamDef1, expectedParamDef2)))
     val expectedPatternDef2 = PatternDef(PatternId("id2"), None)
-    val expectedResult = Some(Seq(expectedPatternDef1, expectedPatternDef2))
+    val expectedResult = Some(List(expectedPatternDef1, expectedPatternDef2))
 
     val result = ToolHelper.getPatternsToLint(conf)(spec)
 

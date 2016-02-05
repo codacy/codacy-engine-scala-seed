@@ -23,17 +23,17 @@ object FileHelper {
       .stripPrefix("/")
   }
 
-  def listAllFiles(path: String): Seq[File] = {
+  def listAllFiles(path: String): List[File] = {
     listAllFiles(Paths.get(path))
   }
 
-  def listAllFiles(path: Path): Seq[File] = {
+  def listAllFiles(path: Path): List[File] = {
     recursiveListFiles(path.toFile)
   }
 
-  private def recursiveListFiles(file: File): Seq[File] = {
+  private def recursiveListFiles(file: File): List[File] = {
     val these = file.listFiles
-    these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
+    (these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)).toList
   }
 
 }

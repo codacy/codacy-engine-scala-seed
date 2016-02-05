@@ -9,11 +9,11 @@ import scala.language.postfixOps
 import scala.sys.process._
 import scala.util.{Failure, Success, Try}
 
-case class CommandResult(exitCode: Int, stdout: Seq[String], stderr: Seq[String])
+case class CommandResult(exitCode: Int, stdout: List[String], stderr: List[String])
 
 object CommandRunner {
 
-  def exec(cmd: Seq[String], dir: Option[File] = None): Either[Throwable, CommandResult] = {
+  def exec(cmd: List[String], dir: Option[File] = None): Either[Throwable, CommandResult] = {
     val stdout = mutable.Buffer[String]()
     val stderr = mutable.Buffer[String]()
 
@@ -23,7 +23,7 @@ object CommandRunner {
       case Success(process) =>
         Try(process.exitValue()) match {
           case Success(exitValue) =>
-            Right(CommandResult(exitValue, stdout, stderr))
+            Right(CommandResult(exitValue, stdout.toList, stderr.toList))
 
           case Failure(e) =>
             process.destroy()

@@ -7,9 +7,9 @@ import scala.collection.mutable.ArrayBuffer
 
 class CommandRunnerTest extends FlatSpec with Matchers {
 
-  val genericCMD = Seq("echo", "foo")
-  val invalidCMD = Seq("rm", "nofile.ext")
-  val errorCMD = Seq("rmzzz", "nofile.ext")
+  val genericCMD = List("echo", "foo")
+  val invalidCMD = List("rm", "nofile.ext")
+  val errorCMD = List("rmzzz", "nofile.ext")
 
   "CommandRunner" should "simpleEchoExec" in {
     val result: Either[Throwable, CommandResult] = CommandRunner.exec(genericCMD)

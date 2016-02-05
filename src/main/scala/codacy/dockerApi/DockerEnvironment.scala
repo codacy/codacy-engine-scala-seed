@@ -30,7 +30,7 @@ object DockerEnvironment {
   }
 
   private[this] def asFailure(error: Seq[(JsPath, Seq[ValidationError])]) =
-    Failure(new Throwable(Json.stringify(JsError.toFlatJson(error))))
+    Failure(new Throwable(Json.stringify(JsError.toFlatJson(error.toList))))
 
   private[this] lazy val configFilePath = sourcePath.resolve(".codacy.json")
 

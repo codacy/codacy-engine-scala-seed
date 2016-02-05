@@ -14,21 +14,21 @@ abstract class DockerEngine(Tool: Tool) {
 
   def initTimeout(duration: FiniteDuration) = {
     implicit val ct: ExecutionContext = sys.dispatcher
-    sys.scheduler.scheduleOnce(duration){
-      Runtime.getRuntime().halt(2)
+    sys.scheduler.scheduleOnce(duration) {
+      Runtime.getRuntime.halt(2)
     }
   }
 
-  lazy val timeout = Option(System.getProperty("timeout")).flatMap{ case rawDuration =>
-    Try(Duration(rawDuration)).toOption.collect{ case d:FiniteDuration => d }
+  lazy val timeout = Option(System.getProperty("timeout")).flatMap { case rawDuration =>
+    Try(Duration(rawDuration)).toOption.collect { case d: FiniteDuration => d }
   }.getOrElse(30.minutes)
 
-  lazy val isDebug = Option(System.getProperty("debug")).flatMap{ case rawDebug =>
+  lazy val isDebug = Option(System.getProperty("debug")).flatMap { case rawDebug =>
     Try(rawDebug.toBoolean).toOption
   }.getOrElse(false)
 
-  def log(message:String):Unit = if(isDebug){
-    Console.err.print(s"[DockerEngine] $message")
+  def log(message: String): Unit = if (isDebug) {
+    Console.err.println(s"[DockerEngine] $message")
   }
 
   def main(args: Array[String]): Unit = {
@@ -64,6 +64,7 @@ abstract class DockerEngine(Tool: Tool) {
             logResult(relativeIssue)
         }
         log("tool finished")
+        System.exit(0)
       case Failure(error) =>
         error.printStackTrace(Console.err)
         System.exit(1)

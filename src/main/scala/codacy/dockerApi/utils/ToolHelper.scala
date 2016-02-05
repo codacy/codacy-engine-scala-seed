@@ -4,7 +4,7 @@ import codacy.dockerApi._
 
 object ToolHelper {
 
-  def getPatternsToLint(conf: Option[Seq[PatternDef]])(implicit spec: Spec): Option[Seq[PatternDef]] = {
+  def getPatternsToLint(conf: Option[List[PatternDef]])(implicit spec: Spec): Option[List[PatternDef]] = {
     conf.map {
       configuration =>
         configuration.map(pattern => getMissingParametersFromSpec(pattern))
