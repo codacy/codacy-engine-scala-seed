@@ -3,14 +3,17 @@ package codacy.dockerApi.traits
 import java.io.File
 import java.nio.file.Path
 
-import scala.util.{Success, Failure, Try}
-
 import codacy.dockerApi.utils.CommandRunner
 
+import scala.util.{Failure, Success, Try}
+
 sealed trait Builder {
+
   val command: List[String]
   val pathComponents: Seq[String]
+
   def supported(path: Path): Boolean
+
   def targetOfDirectory(path: File): Option[String]
 
   private def buildWithCommand(command: List[String], path: Path): Try[Boolean] = {
@@ -43,6 +46,7 @@ object MavenBuilder extends Builder {
 }
 
 object SBTBuilder extends Builder {
+
   val command = List("sbt", "compile")
   val pathComponents = Seq("src", "main", "scala")
 
@@ -51,15 +55,16 @@ object SBTBuilder extends Builder {
   }
 
   def targetOfDirectory(path: File): Option[String] = {
-    val target = new File(Seq(path.getAbsolutePath, "target").mkString(File.separator))
-    target.exists match {
+    val target = new File(path.getAbsolutePath, "target")
+    Option(target.exists).flatMap {
       case true =>
-        val potentialScalaDir = target.list.filter { case filepath => filepath.startsWith("scala-")}
-        // TODO: Cleaner way to do this?
-        val scalaDirectory = potentialScalaDir.headOption.fold("") { case target => target}
-        Some(Seq(target.getAbsolutePath, scalaDirectory, "classes").mkString(File.separator))
+        val potentialScalaDir = target.list.find { case filepath => filepath.startsWith("scala-") }
+        potentialScalaDir.map { case scalaDirectory =>
+          target.toPath.resolve(scalaDirectory).resolve("classes").toString
+        }
       case false =>
         Option.empty
     }
   }
+
 }
