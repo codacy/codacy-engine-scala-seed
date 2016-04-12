@@ -46,11 +46,18 @@ abstract class DockerEngine(Tool: Tool) {
         }))
 
         log("tool started")
-        Tool(
-          path = sourcePath,
-          conf = maybePatterns,
-          files = maybeFiles
-        )
+        try {
+          Tool.apply(
+            path = sourcePath,
+            conf = maybePatterns,
+            files = maybeFiles
+          )
+        } catch {
+          // We need to catch Throwable here to avoid JVM crashes
+          // Crashes can lead to docker not exiting properly
+          case e: Throwable =>
+            Failure(e)
+        }
       }
     } match {
       case Success(results) =>
@@ -67,7 +74,7 @@ abstract class DockerEngine(Tool: Tool) {
         System.exit(0)
       case Failure(error) =>
         error.printStackTrace(Console.err)
-        System.exit(1)
+        Runtime.getRuntime.halt(1)
     }
   }
 
