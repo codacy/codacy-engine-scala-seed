@@ -1,7 +1,7 @@
 package codacy.dockerApi.utils
 
-import org.scalatest._
 import org.scalatest.EitherValues._
+import org.scalatest._
 
 import scala.collection.mutable.ArrayBuffer
 

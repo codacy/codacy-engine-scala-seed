@@ -1,21 +1,27 @@
+import sbt._
+
+resolvers += Resolver.sonatypeRepo("releases")
+
 name := """codacy-engine-scala-seed"""
 
 organization := "com.codacy"
 
-version := "1.5.0"
+version := "2.7.0"
 
-scalaVersion := "2.10.5"
+scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 
-scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Ywarn-adapted-args", "-Xlint", "-Xfatal-warnings")
+scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Ywarn-adapted-args", "-Xlint")
 
 resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-releases/"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json"  % "2.3.10",
-  "org.scalatest"     %% "scalatest"  % "2.2.4" % "test",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.14"
+  "com.typesafe.play" %% "play-json" % "2.4.8",
+  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.14",
+  "com.codacy" %% "codacy-plugins-api" % "0.1.2" withSources(),
+  "com.github.pathikrit" %% "better-files" % "2.14.0" withSources()
 )
 
 organizationName := "Codacy"
