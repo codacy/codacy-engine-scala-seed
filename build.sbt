@@ -6,7 +6,7 @@ name := """codacy-engine-scala-seed"""
 
 organization := "com.codacy"
 
-version := "2.7.0"
+version := "2.7.1"
 
 scalaVersion := "2.11.8"
 
@@ -19,7 +19,6 @@ resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-re
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.8",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.14",
   "com.codacy" %% "codacy-plugins-api" % "0.1.2" withSources(),
   "com.github.pathikrit" %% "better-files" % "2.14.0" withSources()
 )
