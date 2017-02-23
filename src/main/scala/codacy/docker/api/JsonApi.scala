@@ -3,7 +3,7 @@ package codacy.docker.api
 import play.api.libs.json._
 import scala.language.implicitConversions
 
-private[api] case class ParamValue(value:JsValue) extends AnyVal with Parameter.Value
+private[api] case class ParamValue(value: JsValue) extends AnyVal with Parameter.Value
 
 trait JsonApi {
 
@@ -18,7 +18,7 @@ trait JsonApi {
     }
   }
 
-  implicit def paramValueToJsValue(paramValue:Parameter.Value): JsValue = {
+  implicit def paramValueToJsValue(paramValue: Parameter.Value): JsValue = {
     paramValue match {
       case ParamValue(v) => v
       case _ => JsNull
@@ -26,8 +26,8 @@ trait JsonApi {
   }
 
   implicit lazy val parameterValueFormat: Format[Parameter.Value] = Format(
-    implicitly[Reads[JsValue]].map( Parameter.Value ),
-    Writes( paramValueToJsValue )
+    implicitly[Reads[JsValue]].map(Parameter.Value),
+    Writes(paramValueToJsValue)
   )
 
   implicit lazy val resultLevelFormat = Format(
@@ -38,6 +38,9 @@ trait JsonApi {
     enumReads(Pattern.Category),
     enumWrites[Pattern.Category]
   )
+
+  implicit lazy val patternLanguageFormat = Format(Reads.StringReads.map(Pattern.Language),
+    Writes((v: Pattern.Language) => Json.toJson(v.name))) //Json.format[Pattern.Language]
 
   implicit lazy val patternIdFormat = Format(Reads.StringReads.map(Pattern.Id),
     Writes((v: Pattern.Id) => Json.toJson(v.value))) //Json.format[Pattern.Id]
@@ -60,6 +63,18 @@ trait JsonApi {
   implicit lazy val sourceFileFormat = Format(Reads.StringReads.map(Source.File),
     Writes((v: Source.File) => Json.toJson(v.path))) //Json.format[Source.File]
 
+  implicit lazy val parameterDescriptionTextFormat = Format(Reads.StringReads.map(Parameter.DescriptionText),
+    Writes((v: Parameter.DescriptionText) => Json.toJson(v.value))) //Json.format[Parameter.DescriptionText]
+
+  implicit lazy val patternDescriptionTextFormat = Format(Reads.StringReads.map(Pattern.DescriptionText),
+    Writes((v: Pattern.DescriptionText) => Json.toJson(v.value))) //Json.format[Pattern.DescriptionText]
+
+  implicit lazy val patternTitleFormat = Format(Reads.StringReads.map(Pattern.Title),
+    Writes((v: Pattern.Title) => Json.toJson(v.value))) //Json.format[Pattern.Title]
+
+  implicit lazy val patternTimeToFixFormat = Format(Reads.IntReads.map(Pattern.TimeToFix),
+    Writes((v: Pattern.TimeToFix) => Json.toJson(v.value))) //Json.format[Pattern.TimeToFix]
+
   implicit lazy val parameterSpecificationFormat = Json.format[Parameter.Specification]
   implicit lazy val parameterDefinitionFormat = Json.format[Parameter.Definition]
   implicit lazy val patternDefinitionFormat = Json.format[Pattern.Definition]
@@ -67,6 +82,8 @@ trait JsonApi {
   implicit lazy val toolConfigurationFormat = Json.format[Tool.Configuration]
   implicit lazy val specificationFormat = Json.format[Tool.Specification]
   implicit lazy val configurationFormat = Json.format[Configuration]
+  implicit lazy val parameterDescriptionFormat = Json.format[Parameter.Description]
+  implicit lazy val patternDescriptionFormat = Json.format[Pattern.Description]
 
   implicit lazy val resultWrites: Writes[Result] = Writes[Result]((_: Result) match {
     case r: Result.Issue => Json.writes[Result.Issue].writes(r)
