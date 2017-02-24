@@ -19,7 +19,7 @@ resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-re
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.8",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "com.codacy" %% "codacy-plugins-api" % "0.1.2" withSources(),
+  "com.codacy" %% "codacy-plugins-api" % "1.0.8" withSources(),
   "com.github.pathikrit" %% "better-files" % "2.14.0" withSources()
 )
 
