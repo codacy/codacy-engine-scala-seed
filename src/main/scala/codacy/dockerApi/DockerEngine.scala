@@ -7,22 +7,23 @@ import codacy.dockerApi.DockerEnvironment._
 import codacy.dockerApi.utils.Delayed
 import play.api.libs.json.{Json, Writes}
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 abstract class DockerEngine(Tool: codacy.docker.api.Tool) extends Delayed {
 
-  def initTimeout(duration: FiniteDuration) = {
+  def initTimeout(duration: FiniteDuration): Future[Unit] = {
     delay(duration) {
       Runtime.getRuntime.halt(2)
     }
   }
 
-  lazy val timeout = Option(System.getProperty("timeout")).flatMap { rawDuration =>
+  lazy val timeout: FiniteDuration = Option(System.getProperty("timeout")).flatMap { rawDuration =>
     Try(Duration(rawDuration)).toOption.collect { case d: FiniteDuration => d }
   }.getOrElse(10.minutes)
 
-  lazy val isDebug = Option(System.getProperty("debug")).flatMap { rawDebug =>
+  lazy val isDebug: Boolean = Option(System.getProperty("debug")).flatMap { rawDebug =>
     Try(rawDebug.toBoolean).toOption
   }.getOrElse(false)
 
@@ -43,10 +44,7 @@ abstract class DockerEngine(Tool: codacy.docker.api.Tool) extends Delayed {
         config <- configOpt
         toolCfg <- config.tools.find(_.name == spec.name)
         patterns <- toolCfg.patterns
-      } yield {
-        lazy val existingPatternIds = spec.patterns.map(_.patternId)
-        patterns.filter(pattern => existingPatternIds contains pattern.patternId)
-      }
+      } yield patterns
 
       val filesOpt = for {
         config <- configOpt
@@ -74,10 +72,10 @@ abstract class DockerEngine(Tool: codacy.docker.api.Tool) extends Delayed {
         case Success(results) =>
           log("receiving results")
           results.foreach {
-            case issue@NewResult.Issue(file, _, _, _) =>
+            case issue@NewResult.Issue(_, _, _, _) =>
               val relativeIssue = issue.copy(file = Source.File(relativize(issue.file.path)))
               logResult(relativeIssue)
-            case error@NewResult.FileError(filename, _) =>
+            case error@NewResult.FileError(_, _) =>
               val relativeIssue = error.copy(file = Source.File(relativize(error.file.path)))
               logResult(relativeIssue)
           }
