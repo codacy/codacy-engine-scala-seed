@@ -10,7 +10,7 @@ version := "2.7.1"
 
 scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.10.5", scalaVersion.value)
+crossScalaVersions := Seq(scalaVersion.value)
 
 scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Ywarn-adapted-args", "-Xlint")
 
@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.8",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
   "com.codacy" %% "codacy-plugins-api" % "1.0.8" withSources(),
-  "com.github.pathikrit" %% "better-files" % "2.16.0" withSources()
+  "com.github.pathikrit" %% "better-files" % "2.17.1" withSources()
 )
 
 organizationName := "Codacy"
