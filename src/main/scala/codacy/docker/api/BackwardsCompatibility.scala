@@ -2,18 +2,21 @@ package codacy.docker.api
 
 import java.nio.file.Paths
 
-import codacy.docker.api.JsonApi._
+import codacy.docker.api.Pattern.Definition
+import codacy.docker.api.Source.{Directory, File}
+import codacy.docker.api.Tool.Specification
 import codacy.dockerApi
 import codacy.dockerApi.{ParameterDef, ParameterName, ParameterSpec, PatternDef, PatternId, PatternSpec, Spec, ToolName}
 import play.api.libs.json._
 
 import scala.util.Try
 
-trait BackwardsCompatability {
+trait BackwardsCompatibility {
 
   implicit class AsTool(tool: dockerApi.Tool) extends Tool {
-    override def apply(source: Source.Directory, configuration: Option[List[Pattern.Definition]],
-                       files: Option[Set[Source.File]])(implicit specification: Tool.Specification): Try[List[Result]] = {
+    override def apply(source: Directory, configuration: Option[List[Definition]],
+                       files: Option[Set[File]], options: Map[Configuration.Key, Configuration.Value])
+                      (implicit specification: Specification): Try[List[Result]] = {
       tool.apply(
         path = Paths.get(source.path),
         conf = configuration.map(_.map(toPatternDef)),

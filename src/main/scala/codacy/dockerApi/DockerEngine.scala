@@ -2,7 +2,7 @@ package codacy.dockerApi
 
 import java.nio.file.Paths
 
-import codacy.docker.api.{Source, Result => NewResult}
+import codacy.docker.api.{Configuration, Source, Result => NewResult}
 import codacy.dockerApi.DockerEnvironment._
 import codacy.dockerApi.utils.Delayed
 import play.api.libs.json.{Json, Writes}
@@ -61,7 +61,8 @@ abstract class DockerEngine(Tool: codacy.docker.api.Tool) extends Delayed {
         Tool.apply(
           source = Source.Directory(sourcePath.toString()),
           configuration = patternsOpt,
-          files = filesOpt
+          files = filesOpt,
+          options = configOpt.fold(Map.empty[Configuration.Key,Configuration.Value])(_.options)
         )(spec)
       } catch {
         case t: Throwable =>

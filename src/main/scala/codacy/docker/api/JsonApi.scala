@@ -1,20 +1,24 @@
 package codacy.docker.api
 
 import play.api.libs.json._
+
 import scala.language.implicitConversions
 
 private[api] case class ParamValue(value: JsValue) extends AnyVal with Parameter.Value
+
+private[api] case class ConfigurationValue(value: JsValue) extends AnyVal with Configuration.Value
 
 trait JsonApi {
 
   def enumWrites[E <: Enumeration#Value]: Writes[E] = Writes((e: E) => Json.toJson(e.toString))
 
   def enumReads[E <: Enumeration](e: E): Reads[e.Value] = {
-    Reads.StringReads.flatMap { case value => Reads((_: JsValue) =>
-      e.values.collectFirst { case enumValue if enumValue.toString == value =>
-        JsSuccess(enumValue)
-      }.getOrElse(JsError(s"Invalid enumeration value $value"))
-    )
+    Reads.StringReads.flatMap { value =>
+      Reads((_: JsValue) =>
+        e.values.collectFirst { case enumValue if enumValue.toString == value =>
+          JsSuccess(enumValue)
+        }.getOrElse(JsError(s"Invalid enumeration value $value"))
+      )
     }
   }
 
@@ -28,6 +32,18 @@ trait JsonApi {
   implicit lazy val parameterValueFormat: Format[Parameter.Value] = Format(
     implicitly[Reads[JsValue]].map(Parameter.Value),
     Writes(paramValueToJsValue)
+  )
+
+  implicit def configurationValueToJsValue(configValue: Configuration.Value): JsValue = {
+    configValue match {
+      case ConfigurationValue(v) => v
+      case _ => JsNull
+    }
+  }
+
+  implicit lazy val configurationValueFormat: Format[Configuration.Value] = Format(
+    implicitly[Reads[JsValue]].map(Configuration.Value),
+    Writes(configurationValueToJsValue)
   )
 
   implicit lazy val resultLevelFormat = Format(
@@ -81,6 +97,19 @@ trait JsonApi {
   implicit lazy val patternSpecificationFormat = Json.format[Pattern.Specification]
   implicit lazy val toolConfigurationFormat = Json.format[Tool.Configuration]
   implicit lazy val specificationFormat = Json.format[Tool.Specification]
+  implicit lazy val configurationOptionsKeyFormat = Json.format[Configuration.Key]
+  implicit lazy val configurationOptionsFormat = Format[Map[Configuration.Key, Configuration.Value]](
+    Reads { (json: JsValue) =>
+      JsSuccess(
+        json.asOpt[Map[String, JsValue]].fold(Map.empty[Configuration.Key, Configuration.Value]) {
+          _.map { case (k, v) =>
+            Configuration.Key(k) -> Configuration.Value(v)
+          }
+        }
+      )
+    },
+    Writes(m => JsObject(m.map { case (k, v: ConfigurationValue) => k.value -> v.value }))
+  )
   implicit lazy val configurationFormat = Json.format[Configuration]
   implicit lazy val parameterDescriptionFormat = Json.format[Parameter.Description]
   implicit lazy val patternDescriptionFormat = Json.format[Pattern.Description]
