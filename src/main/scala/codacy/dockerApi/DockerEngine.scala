@@ -62,10 +62,11 @@ abstract class DockerEngine(Tool: codacy.docker.api.Tool) extends Delayed {
           source = Source.Directory(sourcePath.toString()),
           configuration = patternsOpt,
           files = filesOpt,
-          options = configOpt.fold(Map.empty[Configuration.Key,Configuration.Value])(_.options)
+          options = configOpt.flatMap(_.options).getOrElse(Map.empty)
         )(spec)
       } catch {
         case t: Throwable =>
+          t.printStackTrace(Console.err)
           Failure(t)
       }
 
