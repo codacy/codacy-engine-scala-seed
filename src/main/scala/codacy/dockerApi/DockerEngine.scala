@@ -66,7 +66,6 @@ abstract class DockerEngine(Tool: codacy.docker.api.Tool) extends Delayed {
         )(spec)
       } catch {
         case t: Throwable =>
-          t.printStackTrace(Console.err)
           Failure(t)
       }
 
