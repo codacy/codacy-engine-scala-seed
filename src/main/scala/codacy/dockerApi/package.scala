@@ -2,7 +2,7 @@ package codacy
 
 import java.nio.file.Path
 
-import codacy.docker.api.{BackwardsCompatability, JsonApi}
+import codacy.docker.api.{BackwardsCompatibility, JsonApi}
 import play.api.libs.json.{JsValue, Reads, Writes, _}
 
 import scala.language.reflectiveCalls
@@ -109,7 +109,7 @@ package dockerApi {
 
 }
 
-package object dockerApi extends BackwardsCompatability with JsonApi {
+package object dockerApi extends BackwardsCompatibility with JsonApi {
 
   implicit class ResultExtension[A](val result: JsResult[A]) extends AnyVal {
     def asTry = result.fold(
