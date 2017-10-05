@@ -76,6 +76,9 @@ trait JsonApi {
   implicit lazy val toolNameFormat = Format(Reads.StringReads.map(Tool.Name),
     Writes((v: Tool.Name) => Json.toJson(v.value))) //Json.format[Tool.Name]
 
+  implicit lazy val toolVersionFormat = Format(Reads.StringReads.map(Tool.Version),
+    Writes((v: Tool.Version) => Json.toJson(v.value))) //Json.format[Tool.Version]
+
   implicit lazy val sourceFileFormat = Format(Reads.StringReads.map(Source.File),
     Writes((v: Source.File) => Json.toJson(v.path))) //Json.format[Source.File]
 
