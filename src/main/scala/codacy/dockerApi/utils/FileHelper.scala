@@ -42,7 +42,7 @@ object FileHelper {
     * @param root            path to search recursively
     * @param configFileNames to match the files while searching
     * @param maxDepth        to search
-    * @return config file path closer to the root
+    * @return config file path closest to the root
     */
   def findConfigurationFile(root: Path, configFileNames: Set[String], maxDepth: Int = 5): Option[Path] = {
     val allFiles = better.files.File(root).walk(maxDepth = maxDepth)
