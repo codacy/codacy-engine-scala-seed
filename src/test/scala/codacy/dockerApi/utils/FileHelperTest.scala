@@ -1,5 +1,8 @@
 package codacy.dockerApi.utils
 
+import java.nio.file.Path
+
+import better.files.File
 import org.scalatest._
 
 class FileHelperTest extends FlatSpec with Matchers {
@@ -46,8 +49,40 @@ class FileHelperTest extends FlatSpec with Matchers {
   "FileHelper" should "createTmpFile" in {
     val fileTmp = FileHelper.createTmpFile("foo", "prefix", ".ext").toString
 
-    java.nio.file.Paths.get(fileTmp).getFileName.toString should startWith("prefix")
+    java.nio.file.Paths.get(fileTmp).getFileName.toString should startWith(
+      "prefix")
     fileTmp should endWith(".ext")
     io.Source.fromFile(fileTmp).mkString should be("foo")
   }
+
+  "FileHelper#findConfigurationFile" should "find the configuration file closest to the root" in {
+    (for {
+      root <- File.temporaryDirectory()
+    } yield {
+      root./("test.json").write("content")
+
+      val configFile: Option[Path] =
+        FileHelper.findConfigurationFile(root.path,
+                                         configFileNames = Set("test.json"))
+
+      configFile should be(Option(root./("test.json").path))
+    }).get()
+  }
+
+  "FileHelper#findConfigurationFile" should "not find the configuration file closest to the root if its deeper then 5 in the path" in {
+    (for {
+      root <- File.temporaryDirectory()
+    } yield {
+      val subDirectory: File = root / "one" / "two" / "three" / "four" / "five"
+      subDirectory.createDirectories()
+      subDirectory./("test.json").write("content")
+
+      val configFile: Option[Path] =
+        FileHelper.findConfigurationFile(root.path,
+                                         configFileNames = Set("test.json"))
+
+      configFile should be(Option.empty[Path])
+    }).get()
+  }
+
 }

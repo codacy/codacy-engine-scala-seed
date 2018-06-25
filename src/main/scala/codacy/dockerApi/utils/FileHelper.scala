@@ -36,15 +36,22 @@ object FileHelper {
     (these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)).toList
   }
 
-  def findConfigurationFile(candidates: Set[String], path: Path): Option[Path] = {
-    candidates.flatMap { nativeConfigFileName =>
-      better.files.File(path).listRecursively
-        .filter(f => f.name == nativeConfigFileName)
-        .map(_.path)
-    }
-      .to[List]
-      .sortBy(_.toString.length)
-      .headOption
+  /**
+    * Find the configuration file path
+    *
+    * @param root            path to search recursively
+    * @param configFileNames to match the files while searching
+    * @param maxDepth        to search
+    * @return config file path closer to the root
+    */
+  def findConfigurationFile(root: Path, configFileNames: Set[String], maxDepth: Int = 5): Option[Path] = {
+    val allFiles = better.files.File(root).walk(maxDepth = maxDepth)
+
+    val configFiles: List[Path] = configFileNames.flatMap { nativeConfigFileName =>
+      allFiles.filter(_.name == nativeConfigFileName).map(_.path)
+    }(collection.breakOut)
+
+    configFiles.sortBy(_.toString.length).headOption
   }
 
 }

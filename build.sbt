@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.8",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
   "com.codacy" %% "codacy-plugins-api" % "1.0.11" withSources(),
-  "com.github.pathikrit" %% "better-files" % "2.17.1" withSources()
+  "com.github.pathikrit" %% "better-files" % "3.5.0" withSources()
 )
 
 organizationName := "Codacy"
