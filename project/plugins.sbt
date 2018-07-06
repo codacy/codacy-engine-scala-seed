@@ -1,19 +1,18 @@
-import sbt._
+// Publishing
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.3")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.1")
 
-resolvers ++= Seq(
-  DefaultMavenRepository,
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
-  Classpaths.typesafeReleases,
-  Classpaths.sbtPluginReleases
-)
+// Formating
+addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "1.5.1")
 
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "0.5.1")
+// Coverage
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "1.3.12")
 
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
+// Static Analysis
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.0.9")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.10")
 
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.9")
-
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.3")
-
-addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "1.2.1")
+// Dependencies
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.0")
