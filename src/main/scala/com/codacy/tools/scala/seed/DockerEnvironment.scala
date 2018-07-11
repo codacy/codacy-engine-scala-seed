@@ -26,7 +26,7 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
             case d: FiniteDuration => d
         }
       )
-      .getOrElse(10.minutes)
+      .getOrElse(15.minutes)
 
   val debug: Boolean =
     variables.get("DEBUG").flatMap(debugStrValue => Try(debugStrValue.toBoolean).toOption).getOrElse(false)
