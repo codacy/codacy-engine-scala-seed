@@ -3,7 +3,8 @@ package com.codacy.tools.scala.seed
 import java.io.{ByteArrayOutputStream, PrintStream}
 
 import better.files.File
-import com.codacy.plugins.api.results.Result.FileError
+import com.codacy.plugins.api.Implicits._
+import com.codacy.plugins.api.results.ToolResult.FileError
 import com.codacy.plugins.api.results.{Pattern, Tool}
 import com.codacy.plugins.api.{ErrorMessage, Options, Source}
 import com.codacy.tools.scala.seed.utils.FileHelper
@@ -19,7 +20,7 @@ import scala.util.{Failure, Random, Success, Try}
 class DockerEngineSpecs extends Specification with Mockito {
 
   private val stubSpec =
-    Tool.Specification(Tool.Name("Name"), Option(Tool.Version("1.0.0-SNAPSHOT")), Set.empty[Pattern.Specification])
+    Tool.Specification(Tool.Name("Name"), Option(Tool.Version("1.0.0-SNAPSHOT")), Set.empty[Pattern.Specification], None)
 
   class StubDockerEnvironment extends DockerEnvironment(Map.empty) {
     override def specification(specificationPath: File): Try[Tool.Specification] =

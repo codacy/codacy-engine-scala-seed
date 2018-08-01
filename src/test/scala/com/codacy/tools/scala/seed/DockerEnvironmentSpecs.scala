@@ -1,6 +1,7 @@
 package com.codacy.tools.scala.seed
 
 import better.files.File
+import com.codacy.plugins.api.Implicits._
 import com.codacy.plugins.api.Source
 import com.codacy.plugins.api.results.Tool
 import org.specs2.mutable.Specification

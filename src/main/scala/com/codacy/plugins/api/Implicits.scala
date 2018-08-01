@@ -1,13 +1,26 @@
-package com.codacy.plugins
+package com.codacy.plugins.api
 
+
+import com.codacy.plugins.api.docker.v2.{IssueResult, Problem}
+import com.codacy.plugins.api.docker.v2.Problem.Reason._
 import com.codacy.plugins.api.languages.{Language, Languages}
-import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
+import com.codacy.plugins.api.results._
 import play.api.libs.json.{JsResult, _}
 
+import scala.concurrent.duration.{FiniteDuration, TimeUnit}
 import scala.language.implicitConversions
 import scala.util.Try
 
-package object api {
+object Implicits {
+
+  private case class ApiFinitDuration(length: Long, unit: TimeUnit)
+
+  private def finiteDurationFrom(mine: ApiFinitDuration) = {
+    new FiniteDuration(mine.length, mine.unit)
+  }
+  private def serializableFromFiniteDuration(finiteDuration: FiniteDuration) = {
+    ApiFinitDuration(finiteDuration.length, finiteDuration.unit)
+  }
 
   implicit def paramValueToJsValue(paramValue: Parameter.Value): JsValue = {
     paramValue match {
@@ -59,16 +72,16 @@ package object api {
   implicit lazy val configurationValueFormat: Format[Options.Value] =
     Format(implicitly[Reads[JsValue]].map(Options.Value), Writes(optionsValueToJsValue))
 
-  implicit lazy val resultLinesFormat: Format[Result.Lines] =
-    Json.format[Result.Lines]
-  implicit lazy val resultPositionFormat: Format[Result.Position] =
-    Json.format[Result.Position]
-  implicit lazy val resultPositionsFormat: Format[Result.Positions] =
-    Json.format[Result.Positions]
-  implicit lazy val resultLocaltionFormat: Format[Result.Location] =
-    Json.format[Result.Location]
-  implicit lazy val resultLevelFormat: Format[Result.Level.Value] =
-    Format(enumReads(Result.Level), enumWrites[Result.Level])
+  implicit lazy val resultLinesFormat: Format[IssueResult.Lines] =
+    Json.format[IssueResult.Lines]
+  implicit lazy val resultPositionFormat: Format[IssueResult.Position] =
+    Json.format[IssueResult.Position]
+  implicit lazy val resultPositionsFormat: Format[IssueResult.Positions] =
+    Json.format[IssueResult.Positions]
+  implicit lazy val resultLocaltionFormat: Format[IssueResult.Location] =
+    Json.format[IssueResult.Location]
+  implicit lazy val resultLevelFormat: Format[IssueResult.Level.Value] =
+    Format(enumReads(IssueResult.Level), enumWrites[IssueResult.Level.Value])
   implicit lazy val patternCategoryFormat: Format[Pattern.Category.Value] =
     Format(enumReads(Pattern.Category), enumWrites[Pattern.Category])
 
@@ -90,8 +103,8 @@ package object api {
   implicit lazy val errorMessageFormat: Format[ErrorMessage] =
     Format(Reads.StringReads.map(ErrorMessage), Writes((v: ErrorMessage) => Json.toJson(v.value)))
 
-  implicit lazy val resultMessageFormat: Format[Result.Message] =
-    Format(Reads.StringReads.map(Result.Message), Writes((v: Result.Message) => Json.toJson(v.value)))
+  implicit lazy val resultMessageFormat: Format[IssueResult.Message] =
+    Format(Reads.StringReads.map(IssueResult.Message), Writes((v: IssueResult.Message) => Json.toJson(v.value)))
 
   implicit lazy val resultLineFormat: Format[Source.Line] =
     Format(Reads.IntReads.map(Source.Line), Writes((v: Source.Line) => Json.toJson(v.value)))
@@ -99,11 +112,11 @@ package object api {
   implicit lazy val parameterNameFormat: Format[Parameter.Name] =
     Format(Reads.StringReads.map(Parameter.Name), Writes((v: Parameter.Name) => Json.toJson(v.value)))
 
-  implicit lazy val toolNameFormat: Format[Tool.Name] =
-    Format(Reads.StringReads.map(Tool.Name), Writes((v: Tool.Name) => Json.toJson(v.value)))
+  implicit lazy val toolNameFormat: Format[IssuesTool.Name] =
+    Format(Reads.StringReads.map(IssuesTool.Name), Writes((v: IssuesTool.Name) => Json.toJson(v.value)))
 
-  implicit lazy val toolVersionFormat: Format[Tool.Version] =
-    Format(Reads.StringReads.map(Tool.Version), Writes((v: Tool.Version) => Json.toJson(v.value)))
+  implicit lazy val toolVersionFormat: Format[IssuesTool.Version] =
+    Format(Reads.StringReads.map(IssuesTool.Version), Writes((v: IssuesTool.Version) => Json.toJson(v.value)))
 
   implicit lazy val sourceFileFormat: Format[Source.File] =
     Format(Reads.StringReads.map(Source.File), Writes((v: Source.File) => Json.toJson(v.path)))
@@ -126,8 +139,8 @@ package object api {
   implicit lazy val parameterDefinitionFormat: Format[Parameter.Definition] = Json.format[Parameter.Definition]
   implicit lazy val patternDefinitionFormat: Format[Pattern.Definition] = Json.format[Pattern.Definition]
   implicit lazy val patternSpecificationFormat: Format[Pattern.Specification] = Json.format[Pattern.Specification]
-  implicit lazy val toolConfigurationFormat: Format[Tool.Configuration] = Json.format[Tool.Configuration]
-  implicit lazy val specificationFormat: Format[Tool.Specification] = Json.format[Tool.Specification]
+  implicit lazy val toolConfigurationFormat: Format[IssuesTool.Configuration] = Json.format[IssuesTool.Configuration]
+  implicit lazy val specificationFormat: Format[IssuesTool.Specification] = Json.format[IssuesTool.Specification]
   implicit lazy val configurationOptionsKeyFormat: Format[Options.Key] = Json.format[Options.Key]
   implicit lazy val configurationOptionsFormat: Format[Map[Options.Key, Options.Value]] =
     Format[Map[Options.Key, Options.Value]](
@@ -144,13 +157,34 @@ package object api {
   implicit lazy val parameterDescriptionFormat: Format[Parameter.Description] = Json.format[Parameter.Description]
   implicit lazy val patternDescriptionFormat: Format[Pattern.Description] = Json.format[Pattern.Description]
 
-  implicit lazy val resultWrites: Writes[Result] = Writes[Result]((_: Result) match {
-    case r: Result.Issue => Json.writes[Result.Issue].writes(r)
-    case r: Result.ExtendedIssue => Json.writes[Result.ExtendedIssue].writes(r)
-    case e: Result.FileError => Json.writes[Result.FileError].writes(e)
+  implicit val timeUnit: Format[TimeUnit] = Format(Reads[TimeUnit] { stringUnit: JsValue =>
+    stringUnit.validate[String].map(x => java.util.concurrent.TimeUnit.valueOf(x))
+  }, Writes[TimeUnit] { timeUnit: TimeUnit =>
+    JsString(timeUnit.toString)
   })
 
-  implicit lazy val toolCodacyConfigurationFormat: Format[Tool.CodacyConfiguration] =
-    Json.format[Tool.CodacyConfiguration]
+  implicit val durationFmt: Format[FiniteDuration] =
+    Format(Json.reads[ApiFinitDuration].map(finiteDurationFrom), Writes[FiniteDuration] { finiteDuration =>
+      Json.writes[ApiFinitDuration].writes(serializableFromFiniteDuration(finiteDuration))
+    })
+
+  implicit val parameterProblemFmt: Format[Problem.Reason.ParameterProblem] = Json.format[Problem.Reason.ParameterProblem]
+  implicit val optionProblemFmt: Format[Problem.Reason.OptionProblem] = Json.format[Problem.Reason.OptionProblem]
+
+  implicit val missingConfigurationFmt: Format[Problem.Reason.MissingConfiguration] = Json.format[Problem.Reason.MissingConfiguration]
+  implicit val invalidConfigurationFmt: Format[Problem.Reason.InvalidConfiguration] = Json.format[Problem.Reason.InvalidConfiguration]
+  implicit val missingOptionsFmt: Format[Problem.Reason.MissingOptions] = Json.format[Problem.Reason.MissingOptions]
+  implicit val invalidOptionsFmt: Format[Problem.Reason.InvalidOptions] = Json.format[Problem.Reason.InvalidOptions]
+  implicit val timeoutFmt: Format[Problem.Reason.TimedOut] = Json.format[Problem.Reason.TimedOut]
+  implicit val missingArtifactsFmt: Format[Problem.Reason.MissingArtifacts] = Json.format[Problem.Reason.MissingArtifacts]
+  implicit val invalidArtifactsFmt: Format[Problem.Reason.InvalidArtifacts] = Json.format[Problem.Reason.InvalidArtifacts]
+  implicit val otherReasonFmt: Format[Problem.Reason.OtherReason] = Json.format[Problem.Reason.OtherReason]
+
+  implicit val analysisProblemReason: Writes[Problem.Reason] = ???
+
+  implicit val IssueResultFmt: Writes[IssueResult] = ???
+
+  implicit lazy val toolCodacyConfigurationFormat: Format[IssuesTool.CodacyConfiguration] =
+    Json.format[IssuesTool.CodacyConfiguration]
 
 }

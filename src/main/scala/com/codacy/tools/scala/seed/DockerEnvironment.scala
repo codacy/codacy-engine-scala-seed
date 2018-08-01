@@ -3,7 +3,7 @@ package com.codacy.tools.scala.seed
 import java.nio.file.{Path, Paths}
 
 import better.files._
-import com.codacy.plugins.api._
+import com.codacy.plugins.api.Implicits._
 import com.codacy.plugins.api.results.Tool
 import com.codacy.tools.scala.seed.traits.JsResultOps._
 import play.api.libs.json.Json

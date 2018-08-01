@@ -2,7 +2,7 @@ package com.codacy.tools.scala.seed
 
 import java.nio.file.{Path, Paths}
 
-import com.codacy.plugins.api.results.{Pattern, Result, Tool}
+import com.codacy.plugins.api.results.{Pattern, Tool, ToolResult}
 import com.codacy.plugins.api.{Options, Source}
 import com.codacy.tools.scala.seed.traits.{Delayable, Haltable}
 
@@ -84,7 +84,7 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
     } yield options).getOrElse(Map.empty[Options.Key, Options.Value])
   }
 
-  private def printResults(toolResult: Try[List[Result]]): Unit = {
+  private def printResults(toolResult: Try[List[ToolResult]]): Unit = {
     toolResult match {
       case Success(results) =>
         printer.info(s"Got ${results.length} results")

@@ -3,8 +3,10 @@ package com.codacy.tools.scala.seed
 import java.io.PrintStream
 import java.nio.file.Path
 
+import com.codacy.plugins.api.Implicits._
 import com.codacy.plugins.api.Source
-import com.codacy.plugins.api.results.Result
+import com.codacy.plugins.api.results.ToolResult
+import com.codacy.plugins.api.results.ToolResult.ToolProblem
 import com.codacy.tools.scala.seed.utils.FileHelper
 import play.api.libs.json.{Json, Writes}
 
@@ -24,22 +26,25 @@ class Printer(infoStream: PrintStream = Console.out,
     error.foreach(_.printStackTrace(errStream))
   }
 
-  def results(rootFile: Path, results: List[Result]): Unit = {
+  def results(rootFile: Path, results: List[ToolResult]): Unit = {
     results.foreach {
-      case issue @ Result.Issue(_, _, _, _) =>
+      case issue: ToolResult.Issue =>
         val relativeIssue = issue.copy(file = Source.File(relativize(rootFile, issue.file.path)))
         logResult(relativeIssue)
 
-      case extendedIssue @ Result.ExtendedIssue(_, _, _, _, _) =>
+      case extendedIssue: ToolResult.ExtendedIssue =>
         val relativeIssue = extendedIssue.copy(
           location =
             extendedIssue.location.copy(path = Source.File(relativize(rootFile, extendedIssue.location.path.path)))
         )
         logResult(relativeIssue)
 
-      case error @ Result.FileError(_, _) =>
+      case error: ToolResult.FileError =>
         val relativeIssue = error.copy(file = Source.File(relativize(rootFile, error.file.path)))
         logResult(relativeIssue)
+
+      case problem: ToolProblem =>
+        error(Json.stringify(Json.toJson(problem)))
     }
   }
 

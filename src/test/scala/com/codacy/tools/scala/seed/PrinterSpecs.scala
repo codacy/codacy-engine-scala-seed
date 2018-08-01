@@ -2,9 +2,10 @@ package com.codacy.tools.scala.seed
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 
+import com.codacy.plugins.api.Implicits._
 import com.codacy.plugins.api.Source
-import com.codacy.plugins.api.results.Result.Issue
-import com.codacy.plugins.api.results.{Pattern, Result}
+import com.codacy.plugins.api.results.ToolResult.Issue
+import com.codacy.plugins.api.results.{Pattern, ToolResult}
 import com.codacy.tools.scala.seed.utils.FileHelper
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
@@ -21,7 +22,7 @@ class PrinterSpecs extends Specification {
       val fileName = "a.scala"
       val sourcePath = dockerMetricsEnvironment.defaultRootFile
       val result =
-        Issue(Source.File("a.scala"), Result.Message("Found issue"), Pattern.Id("pattern-id"), Source.Line(1))
+        Issue(Source.File("a.scala"), ToolResult.Message("Found issue"), Pattern.Id("pattern-id"), Source.Line(1))
 
       //when
       printer.results(sourcePath, List(result))
