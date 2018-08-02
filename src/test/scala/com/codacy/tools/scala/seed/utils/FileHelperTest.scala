@@ -55,6 +55,19 @@ class FileHelperTest extends Specification {
           }).get()
         }
 
+        "find the configuration file closest to the root with two possible configuration file names" >> {
+          (for {
+            root <- File.temporaryDirectory()
+          } yield {
+            root./("test2.json").write("content")
+
+            val configFile: Option[Path] =
+              FileHelper.findConfigurationFile(root.path, configFileNames = Set("test.json", "test2.json"))
+
+            configFile must beEqualTo(Option(root./("test2.json").path))
+          }).get()
+        }
+
         "not find the configuration file closest to the root if its deeper then 5 in the path" >> {
           (for {
             root <- File.temporaryDirectory()
