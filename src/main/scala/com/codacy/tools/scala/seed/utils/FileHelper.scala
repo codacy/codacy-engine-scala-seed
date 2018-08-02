@@ -34,13 +34,10 @@ object FileHelper {
     * @return config file path closer to the root
     */
   def findConfigurationFile(root: Path, configFileNames: Set[String], maxDepth: Int = 5): Option[Path] = {
-    val allFiles = File(root).walk(maxDepth = maxDepth)
-
-    val configFiles: List[Path] = configFileNames.flatMap { nativeConfigFileName =>
-      allFiles.filter(_.name == nativeConfigFileName).map(_.path)
-    }(collection.breakOut)
-
-    configFiles.sortBy(_.toString.length).headOption
+    File(root)
+      .walk(maxDepth = maxDepth)
+      .find(file => configFileNames.contains(file.name))
+      .map(_.path)
   }
 
 }
