@@ -5,10 +5,9 @@ import java.nio.file.Path
 
 import com.codacy.plugins.api.Implicits._
 import com.codacy.plugins.api.Source
-import com.codacy.plugins.api.results.ToolResult
-import com.codacy.plugins.api.results.ToolResult.ToolProblem
+import com.codacy.plugins.api.docker.v2.IssueResult
 import com.codacy.tools.scala.seed.utils.FileHelper
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.Json
 
 class Printer(infoStream: PrintStream = Console.out,
               errStream: PrintStream = Console.err,
@@ -26,32 +25,23 @@ class Printer(infoStream: PrintStream = Console.out,
     error.foreach(_.printStackTrace(errStream))
   }
 
-  def results(rootFile: Path, results: List[ToolResult]): Unit = {
-    results.foreach {
-      case issue: ToolResult.Issue =>
-        val relativeIssue = issue.copy(file = Source.File(relativize(rootFile, issue.file.path)))
-        logResult(relativeIssue)
+  def results(rootFile: Path, results: List[IssueResult]): Unit = {
+    val relativizedResults: List[IssueResult] = results
+      .map {
+        case issue: IssueResult.Issue =>
+          issue.copy(file = Source.File(relativize(rootFile, issue.file.path)))
 
-      case extendedIssue: ToolResult.ExtendedIssue =>
-        val relativeIssue = extendedIssue.copy(
-          location =
-            extendedIssue.location.copy(path = Source.File(relativize(rootFile, extendedIssue.location.path.path)))
-        )
-        logResult(relativeIssue)
+        case problem: IssueResult.Problem =>
+          problem.copy(file = problem.file.map(f => Source.File(relativize(rootFile, f.path))))
+      }
 
-      case error: ToolResult.FileError =>
-        val relativeIssue = error.copy(file = Source.File(relativize(rootFile, error.file.path)))
-        logResult(relativeIssue)
-
-      case problem: ToolProblem =>
-        error(Json.stringify(Json.toJson(problem)))
-    }
+    relativizedResults.foreach(logResult)
   }
 
   private def relativize(rootFile: Path, path: String): String =
     FileHelper.stripAbsolutePrefix(path, rootFile.toString)
 
-  private def logResult[T](result: T)(implicit fmt: Writes[T]): Unit = {
+  private def logResult(result: IssueResult): Unit = {
     infoStream.println(Json.stringify(Json.toJson(result)))
   }
 

@@ -1,7 +1,7 @@
 package com.codacy.tools.scala.seed.utils
 
 import com.codacy.plugins.api.Implicits._
-import com.codacy.plugins.api.results.{Parameter, Pattern, ToolResult, Tool}
+import com.codacy.plugins.api.results.{IssuesTool, Parameter, Pattern}
 import com.codacy.tools.scala.seed.utils.ToolHelper._
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsNumber, JsString}
@@ -12,12 +12,12 @@ class ToolHelperTest extends Specification {
   val paramSpec2 = Parameter.Specification(Parameter.Name("param2"), Parameter.Value(JsString("value2")))
 
   val patternSpecification1 = Pattern.Specification(Pattern.Id("id1"),
-                                                    ToolResult.Level.Warn,
+                                                    Pattern.Level.Warn,
                                                     Pattern.Category.CodeStyle,
                                                     Some(Set(paramSpec1, paramSpec2)))
 
   val patternSpecification2 =
-    Pattern.Specification(Pattern.Id("id2"), ToolResult.Level.Warn, Pattern.Category.CodeStyle, None)
+    Pattern.Specification(Pattern.Id("id2"), Pattern.Level.Warn, Pattern.Category.CodeStyle, None)
   val patternsSpec = Set(patternSpecification1, patternSpecification2)
 
   val paramDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(33)))
@@ -28,7 +28,8 @@ class ToolHelperTest extends Specification {
   val patternDef1NoParam = Pattern.Definition(Pattern.Id("id1"), None)
   val patternDef2NoParam = Pattern.Definition(Pattern.Id("id2"), None)
 
-  val genericSpec = Tool.Specification(Tool.Name("tool1"), Option(Tool.Version("0.15.6")), patternsSpec, None)
+  val genericSpec =
+    IssuesTool.Specification(IssuesTool.Name("tool1"), Option(IssuesTool.Version("0.15.6")), patternsSpec)
   val genericConf: Option[List[Pattern.Definition]] = Some(List(patternDef1, patternDef2))
   val genericConfNoParam: Option[List[Pattern.Definition]] = Some(List(patternDef1NoParam, patternDef2NoParam))
 
