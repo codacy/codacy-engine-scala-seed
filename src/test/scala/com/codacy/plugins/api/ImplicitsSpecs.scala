@@ -12,12 +12,12 @@ class ImplicitsSpecs extends Specification {
   "Implicit conversions" should {
 
     val missingConfigJsonString =
-      """{"$type":"ToolProblem","message":"this is a message","reason":{"$type":"MissingConfiguration","supportedFilename":["batato"]}}"""
+      s"""{"message":"this is a message","reason":{"supportedFilename":["batato"],"$$type":"com.codacy.plugins.api.docker.v2.Problem$$Reason$$MissingConfiguration"},"$$type":"com.codacy.plugins.api.docker.v2.IssueResult$$Problem"}"""
     val missingConfigToolProblem: IssueResult =
       IssueResult.Problem(ErrorMessage("this is a message"), None, Problem.Reason.MissingConfiguration(Set("batato")))
 
     val timeOutJsonString =
-      """{"$type":"ToolProblem","message":"this is a message","reason":{"$type":"TimedOut","timeout":{"length":10,"unit":"SECONDS"}}}"""
+      s"""{"message":"this is a message","reason":{"timeout":{"length":10,"unit":"SECONDS"},"$$type":"com.codacy.plugins.api.docker.v2.Problem$$Reason$$TimedOut"},"$$type":"com.codacy.plugins.api.docker.v2.IssueResult$$Problem"}"""
     val timeOutToolProblem: IssueResult =
       IssueResult.Problem(ErrorMessage("this is a message"), None, Problem.Reason.TimedOut(10.seconds))
 
@@ -28,6 +28,7 @@ class ImplicitsSpecs extends Specification {
     "serialize ToolProblem with TimeOut reason" in {
       Json.stringify(Json.toJson(timeOutToolProblem)) shouldEqual timeOutJsonString
     }
+
   }
 
 }

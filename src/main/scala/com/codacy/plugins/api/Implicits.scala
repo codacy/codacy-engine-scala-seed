@@ -7,6 +7,7 @@ import play.api.libs.json.{JsResult, _}
 
 import scala.concurrent.duration.{FiniteDuration, TimeUnit}
 import scala.language.implicitConversions
+import scala.reflect.ClassTag
 import scala.util.Try
 
 object Implicits {
@@ -205,8 +206,8 @@ object Implicits {
   implicit lazy val issuesToolCodacyConfigurationFormat: Reads[IssuesTool.CodacyConfiguration] =
     Json.reads[IssuesTool.CodacyConfiguration]
 
-  private def addType[T](jso: JsObject)(implicit evidence: reflect.ClassTag[T]): JsObject = {
-    jso ++ JsObject(Seq(("$type", JsString(evidence.runtimeClass.getCanonicalName))))
+  private def addType[T](jso: JsObject)(implicit ev: ClassTag[T]): JsObject = {
+    jso ++ JsObject(Seq(("$type", JsString(ev.runtimeClass.getName))))
   }
 
 }
