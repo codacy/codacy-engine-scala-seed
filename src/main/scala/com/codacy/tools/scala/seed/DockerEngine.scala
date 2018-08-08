@@ -2,7 +2,8 @@ package com.codacy.tools.scala.seed
 
 import java.nio.file.{Path, Paths}
 
-import com.codacy.plugins.api.results.{Pattern, Result, Tool}
+import com.codacy.plugins.api.docker.v2.IssueResult
+import com.codacy.plugins.api.results.{IssuesTool, Pattern}
 import com.codacy.plugins.api.{Options, Source}
 import com.codacy.tools.scala.seed.traits.{Delayable, Haltable}
 
@@ -10,13 +11,15 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
-abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = new DockerEnvironment())(
-  rootFile: Path = dockerEnvironment.defaultRootFile,
+abstract class DockerEngine(
+  tool: IssuesTool[IssueResult],
+  dockerEnvironment: DockerEnvironment = new DockerEnvironment()
+)(rootFile: Path = dockerEnvironment.defaultRootFile,
   configFile: Path = dockerEnvironment.defaultConfigFile,
   specificationFile: Path = dockerEnvironment.defaultSpecificationFile,
   timeout: FiniteDuration = dockerEnvironment.defaultTimeout,
-  printer: Printer = new Printer(dockerEnvironment = dockerEnvironment)
-) extends Delayable
+  printer: Printer = new Printer(dockerEnvironment = dockerEnvironment))
+    extends Delayable
     with Haltable {
 
   @SuppressWarnings(Array("CatchThrowable"))
@@ -57,8 +60,8 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
   }
 
   private def getToolConfiguration(
-    specification: Tool.Specification,
-    configurations: Option[Tool.CodacyConfiguration]
+    specification: IssuesTool.Specification,
+    configurations: Option[IssuesTool.CodacyConfiguration]
   ): Option[List[Pattern.Definition]] = {
     for {
       configs <- configurations
@@ -67,24 +70,25 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
     } yield patterns
   }
 
-  private def getFiles(configurations: Option[Tool.CodacyConfiguration]): Option[Set[Source.File]] = {
+  private def getFiles(configurations: Option[IssuesTool.CodacyConfiguration]): Option[Set[Source.File]] = {
     for {
       configs <- configurations
       files <- configs.files
     } yield
-      files.map { file =>
-        file.copy(path = rootFile.resolve(Paths.get(file.path)).toString)
+      files.map { file => file.copy(path = rootFile.resolve(Paths.get(file.path)).toString)
       }
   }
 
-  private def getToolOptions(configurations: Option[Tool.CodacyConfiguration]): Map[Options.Key, Options.Value] = {
+  private def getToolOptions(
+    configurations: Option[IssuesTool.CodacyConfiguration]
+  ): Map[Options.Key, Options.Value] = {
     (for {
       configs <- configurations
       options <- configs.options
     } yield options).getOrElse(Map.empty[Options.Key, Options.Value])
   }
 
-  private def printResults(toolResult: Try[List[Result]]): Unit = {
+  private def printResults(toolResult: Try[List[IssueResult]]): Unit = {
     toolResult match {
       case Success(results) =>
         printer.info(s"Got ${results.length} results")

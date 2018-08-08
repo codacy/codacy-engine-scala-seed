@@ -3,8 +3,8 @@ package com.codacy.tools.scala.seed
 import java.nio.file.{Path, Paths}
 
 import better.files._
-import com.codacy.plugins.api._
-import com.codacy.plugins.api.results.Tool
+import com.codacy.plugins.api.Implicits._
+import com.codacy.plugins.api.results.IssuesTool
 import com.codacy.tools.scala.seed.traits.JsResultOps._
 import play.api.libs.json.Json
 
@@ -31,23 +31,23 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
   val debug: Boolean =
     variables.get("DEBUG").flatMap(debugStrValue => Try(debugStrValue.toBoolean).toOption).getOrElse(false)
 
-  def configurations(configFile: File = defaultConfigFile): Try[Option[Tool.CodacyConfiguration]] = {
+  def configurations(configFile: File = defaultConfigFile): Try[Option[IssuesTool.CodacyConfiguration]] = {
     if (configFile.exists) {
       for {
         content <- Try(configFile.byteArray)
         json <- Try(Json.parse(content))
-        cfg <- json.validate[Tool.CodacyConfiguration].asTry
+        cfg <- json.validate[IssuesTool.CodacyConfiguration].asTry
       } yield Some(cfg)
     } else {
-      Success(Option.empty[Tool.CodacyConfiguration])
+      Success(Option.empty[IssuesTool.CodacyConfiguration])
     }
   }
 
-  def specification(specificationPath: File = defaultSpecificationFile): Try[Tool.Specification] = {
+  def specification(specificationPath: File = defaultSpecificationFile): Try[IssuesTool.Specification] = {
     for {
       content <- Try(specificationPath.byteArray)
       json <- Try(Json.parse(content))
-      spec <- json.validate[Tool.Specification].asTry
+      spec <- json.validate[IssuesTool.Specification].asTry
     } yield spec
   }
 

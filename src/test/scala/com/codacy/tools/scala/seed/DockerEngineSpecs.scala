@@ -3,8 +3,9 @@ package com.codacy.tools.scala.seed
 import java.io.{ByteArrayOutputStream, PrintStream}
 
 import better.files.File
-import com.codacy.plugins.api.results.Result.FileError
-import com.codacy.plugins.api.results.{Pattern, Tool}
+import com.codacy.plugins.api.Implicits._
+import com.codacy.plugins.api.docker.v2.{IssueResult, Problem}
+import com.codacy.plugins.api.results.{IssuesTool, Pattern}
 import com.codacy.plugins.api.{ErrorMessage, Options, Source}
 import com.codacy.tools.scala.seed.utils.FileHelper
 import org.mockito.Mockito.when
@@ -19,22 +20,24 @@ import scala.util.{Failure, Random, Success, Try}
 class DockerEngineSpecs extends Specification with Mockito {
 
   private val stubSpec =
-    Tool.Specification(Tool.Name("Name"), Option(Tool.Version("1.0.0-SNAPSHOT")), Set.empty[Pattern.Specification])
+    IssuesTool.Specification(IssuesTool.Name("Name"),
+                             Option(IssuesTool.Version("1.0.0-SNAPSHOT")),
+                             Set.empty[Pattern.Specification])
 
   class StubDockerEnvironment extends DockerEnvironment(Map.empty) {
-    override def specification(specificationPath: File): Try[Tool.Specification] =
+    override def specification(specificationPath: File): Try[IssuesTool.Specification] =
       Success(stubSpec)
-    override def configurations(configFile: File): Try[Option[Tool.CodacyConfiguration]] =
+    override def configurations(configFile: File): Try[Option[IssuesTool.CodacyConfiguration]] =
       Success(
         Option(
-          Tool.CodacyConfiguration(Set.empty[Tool.Configuration],
-                                   Option.empty[Set[Source.File]],
-                                   Option.empty[Map[Options.Key, Options.Value]])
+          IssuesTool.CodacyConfiguration(Set.empty[IssuesTool.Configuration],
+                                         Option.empty[Set[Source.File]],
+                                         Option.empty[Map[Options.Key, Options.Value]])
         )
       )
   }
 
-  class StubEngine(tool: Tool,
+  class StubEngine(tool: IssuesTool[IssueResult],
                    dockerEnvironment: DockerEnvironment,
                    printer: Printer,
                    timeout: FiniteDuration = 10.minutes)
@@ -55,8 +58,10 @@ class DockerEngineSpecs extends Specification with Mockito {
         new Printer(infoStream = outStream, errStream = errStream, dockerEnvironment = dockerEnvironment)
 
       val fileName = "a.scala"
-      val result = FileError(Source.File(fileName), Option.empty[ErrorMessage])
-      val tool = mock[Tool]
+      val result: IssueResult.Problem = IssueResult.Problem(ErrorMessage("Message"),
+                                                            Option(Source.File("/src/a.scala")),
+                                                            Problem.Reason.OtherReason("Message", None, None))
+      val tool = mock[IssuesTool[IssueResult]]
       when(
         tool
           .apply(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec)
@@ -72,7 +77,8 @@ class DockerEngineSpecs extends Specification with Mockito {
       Json.parse(outContent.toString) must beEqualTo(
         Json.toJson(
           result.copy(
-            file = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString))
+            file =
+              Option(Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString)))
           )
         )
       )
@@ -92,7 +98,7 @@ class DockerEngineSpecs extends Specification with Mockito {
       val printer =
         new Printer(infoStream = outStream, errStream = errStream, dockerEnvironment = dockerEnvironment)
 
-      val tool = mock[Tool]
+      val tool = mock[IssuesTool[IssueResult]]
       val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, dockerEnvironment.defaultTimeout))
 
       when(
@@ -126,7 +132,7 @@ class DockerEngineSpecs extends Specification with Mockito {
         Success(List.empty)
       }
 
-      val tool = mock[Tool]
+      val tool = mock[IssuesTool[IssueResult]]
       when(
         tool
           .apply(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec)
