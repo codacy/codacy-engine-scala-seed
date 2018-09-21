@@ -5,7 +5,8 @@
 [![Build Status](https://circleci.com/gh/codacy/codacy-engine-scala-seed.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/codacy-engine-scala-seed)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.codacy/codacy-engine-scala-seed_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.codacy/codacy-engine-scala-seed_2.12)
 
-Framework to help integration with external analysis tools at Codacy.
+Framework to help integration with external analysis tools at Codacy. 
+These tools provide the issues you can see on Codacy after an analysis is completed.
 
 For more details and examples of tools that use this project, you can check:
 * [PMDJava](https://github.com/codacy/codacy-pmdjava)
@@ -17,7 +18,7 @@ For more details and examples of tools that use this project, you can check:
 Add to your SBT dependencies:
 
 ```scala
-"com.codacy" %% "codacy-engine-scala-seed" % "<VERSION>"
+"com.codacy" % "codacy-engine-scala-seed_2.12" % "<VERSION>"
 ```
 
 ## Docs
@@ -43,10 +44,10 @@ You are free to modify and use it for your own tools.
 * To run the tool we provide the configuration file, `/.codacyrc`, with the language to run and optional parameters your tool might need.
 * The source code to be analysed will be located in `/src`, meaning that when provided in the configuration, the file paths are relative to `/src`.
 
-* **.codacyrc**
+* **Structure of the .codacyrc file:**
   * **files:** Files to be analysed (their path is relative to `/src`)
   * **tools:** Array of tools
-    * **name:** Unique identifier of the tool
+    * **name:** Unique identifier of the tool. This will be provided by the tool in patterns.json file.
     * **patterns:** Array of patterns that must be checked
       * **patternId:** Unique identifier of the pattern
       * **parameters:** Parameters of the pattern
@@ -75,13 +76,16 @@ You are free to modify and use it for your own tools.
 }
 ```
 
-Regarding to the configuration file, the tool should have different behaviours for the following situations:
-* If /.codacyrc exists and has files and patterns, use them to run.
-* If /.codacyrc exists and has only files and no patterns, run only for those files.
-* If /.codacyrc does not exist or any of its contents (files or patterns) is not available, 
+Regarding the configuration file, the tool should have different behaviours for the following situations:
+* If `/.codacyrc` exists and has files and patterns, use them to run.
+* If `/.codacyrc` exists and only has patterns and no files, use the patterns to invoke the tool for all files from /src
+(files should be searched recursively for all folders in /src).
+* If `/.codacyrc` exists and has only files and no patterns, run only for those files and look 
+for the tool's native configuration file, if the tool supports it.
+* If `/.codacyrc` does not exist or any of its contents (files or patterns) is not available, 
 you should invoke the tool for all files from /src (files should be searched recursively for all folders in /src) 
-and check them with the default patterns.
-* If /.codacyrc fails to be parsed, throw an error.
+and check them with the tool's native configuration file, if it is supported and if it exists. Otherwise, run the tool with the default patterns.
+* If `/.codacyrc` fails to be parsed, throw an error.
 
 **Exit codes**
 * The exit codes can be different, depending if the tool invocation is successful or not:
@@ -97,6 +101,8 @@ and check them with the default patterns.
 ## Setup
 1. Write the docker file that will run the tool.
    * It must have a binary entry point without any parameters.
+     * Notice that if you decide to use this seed, you can use the [**sbt-native-packager**](https://github.com/sbt/sbt-native-packager) plugin
+     and run `sbt docker:publishLocal` that generates the dockerfile automatically and publishes the docker locally.
 
 2. Write a patterns.json with the configuration of your tool.
     * This file must be located on /docs/patterns.json.
@@ -113,25 +119,36 @@ and check them with the default patterns.
       "name":"jshint",
       "patterns":[
         {
-          "patternId":"latedef",
-          "level": "Error",
-          "category": "UnusedCode",
-          "parameters":[
+          "patternId": "latedef",
+          "category": "ErrorProne",
+          "title": "Enforce variable def before use",
+          "description": "Prohibits the use of a variable before it was defined.",
+          "parameters": [
             {
-              "name":"latedef",
-              "default":"vars"
+              "name": "latedef",
+              "description": "Declaration order verification. Check all [true] | Do not check functions [nofunc]",
+              "default": "nofunc"
             }
-          ]
+          ],
+          "level": "Warning"
         }
       ]
     }
     ```
     #### Levels and Categories
     For level types we have:
-    * Error, Warning, Info
+    * Error
+    * Warning
+    * Info
     
     For category types we have:
-    * ErrorProne, CodeStyle, UnusedCode, Security, Compatibility, Performance, Documentation
+    * ErrorProne 
+    * CodeStyle 
+    * UnusedCode
+    * Security
+    * Compatibility
+    * Performance
+    * Documentation
 
 3. Write the code to run the tool
 You don't have to use this seed and you can write the code in any language you want but, you have to invoke the tool according to the configuration.
@@ -163,31 +180,29 @@ At this point, your tool has everything it needs to run, but there is one other 
 Your files for this section should be placed in /docs/description/.
 
 In order to provide more details you can create:
-* A single /docs/description/description.json
-* **(Optional)** A /docs/description/<PATTERN-ID>.md for each pattern. 
+* A single /docs/description/description.json file.
+* A /docs/description/<PATTERN-ID>.md file for each pattern. 
 This documentation should also be generated automatically to avoid having to go through all of the files each time it needs to be updated.
 
 In the description.json you define the title for the pattern, brief description, time to fix (in minutes), and also a description of the parameters in the following format:    
-
-
 ```json
 [
   {
-    "patternId":"latedef",
-    "title":"This is a title",
-    "description":"This is a description",
-    "timeToFix": 5,
-    "parameters":[
+    "patternId": "latedef",
+    "title": "Enforce variable def before use",
+    "description": "Prohibits the use of a variable before it was defined.",
+    "parameters": [
       {
-        "name":"latedef",
-        "description":"this is a param description"
+        "name": "latedef",
+        "description": "Declaration order verification. Check all [true] | Do not check functions [nofunc]"
       }
-    ]
+    ],
+    "timeToFix": 10
   }
 ]
 ```
 
-**(Optional)** To give a more detailed explanation about the issue, you should define the <PATTERN-ID>.md
+To give a more detailed explanation about the issue, you should define the <PATTERN-ID>.md. Example:
 
 ```markdown
 Fields in interfaces are automatically public static final, and methods are public abstract.
@@ -230,7 +245,6 @@ docker run -t \
 --user=docker \
 --rm=true \
 -v <PATH-TO-FOLDER-WITH-FILES-TO-CHECK>:/src:ro \
-
 <YOUR-DOCKER-NAME>:<YOUR-DOCKER-VERSION>
 ```
 
