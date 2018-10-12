@@ -127,7 +127,17 @@ package object api {
   implicit lazy val patternDefinitionFormat: Format[Pattern.Definition] = Json.format[Pattern.Definition]
   implicit lazy val patternSpecificationFormat: Format[Pattern.Specification] = Json.format[Pattern.Specification]
   implicit lazy val toolConfigurationFormat: Format[Tool.Configuration] = Json.format[Tool.Configuration]
-  implicit lazy val specificationFormat: Format[Tool.Specification] = Json.format[Tool.Specification]
+
+  implicit lazy val specificationFormat: Format[Tool.Specification] =
+    Format[Tool.Specification](Json.reads[Tool.Specification],
+                               Writes[Tool.Specification] { s =>
+                                 JsObject(
+                                   Map("name" -> implicitly[Writes[Tool.Name]].writes(s.name),
+                                       "version" -> implicitly[Writes[Option[Tool.Version]]].writes(s.version),
+                                       "patterns" -> implicitly[Writes[List[Pattern.Specification]]]
+                                         .writes(s.patterns.toList.sortBy(_.patternId.value)))
+                                 )
+                               })
   implicit lazy val configurationOptionsKeyFormat: Format[Options.Key] = Json.format[Options.Key]
   implicit lazy val configurationOptionsFormat: Format[Map[Options.Key, Options.Value]] =
     Format[Map[Options.Key, Options.Value]](
