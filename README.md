@@ -121,12 +121,9 @@ and check them with the tool's native configuration file, if it is supported and
         {
           "patternId": "latedef",
           "category": "ErrorProne",
-          "title": "Enforce variable def before use",
-          "description": "Prohibits the use of a variable before it was defined.",
           "parameters": [
             {
               "name": "latedef",
-              "description": "Declaration order verification. Check all [true] | Do not check functions [nofunc]",
               "default": "nofunc"
             }
           ],
