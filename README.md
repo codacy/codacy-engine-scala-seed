@@ -107,6 +107,7 @@ and check them with the tool's native configuration file, if it is supported and
 2. Write a patterns.json with the configuration of your tool.
     * This file must be located on /docs/patterns.json.
       * **name:** Unique identifier of the tool (lower-case letters without spaces)
+      * **version:** Tool version to display in the Codacy UI
       * **patterns:** The patterns that the tool provides
           * **patternId:** Unique identifier of the pattern (lower-case letters without spaces)
           * **level:** Severity level of the issue 
@@ -117,6 +118,7 @@ and check them with the tool's native configuration file, if it is supported and
     ```json
     {
       "name":"jshint",
+      "version": "1.2.3",
       "patterns":[
         {
           "patternId": "latedef",
