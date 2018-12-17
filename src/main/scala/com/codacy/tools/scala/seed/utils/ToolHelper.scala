@@ -8,17 +8,12 @@ object ToolHelper {
 
     def withDefaultParameters(implicit spec: Tool.Specification): Option[List[Pattern.Definition]] = {
       configuration.map(_.map { pattern =>
-        def toMap(setOpt: Option[Set[Parameter.Definition]]): Option[Map[Parameter.Name, Parameter.Definition]] =
-          setOpt.map(paramSet => paramSet.map(p => (p.name, p))(collection.breakOut))
+        val defaultsOpt = defaultParameters(pattern.patternId)
+        val configurationParameters = pattern.parameters.getOrElse(Set.empty)
 
-        val configurationParameters = toMap(pattern.parameters)
-        val defaults = toMap(defaultParameters(pattern.patternId))
-
-        val parameters =
-          configurationParameters
-            .map(defaults.getOrElse(Map.empty) ++ _) // we give priority to the configuration values over the default values
-            .orElse(defaults)
-            .map(_.values.toSet)
+        val parameters = defaultsOpt.map(
+          _.filterNot(default => configurationParameters.exists(default.name == _.name)) ++ configurationParameters
+        )
 
         pattern.copy(parameters = parameters)
       })
