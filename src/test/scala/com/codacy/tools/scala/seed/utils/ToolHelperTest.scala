@@ -74,5 +74,18 @@ class ToolHelperTest extends Specification {
 
       result must beEqualTo(expectedResult)
     }
+
+    "set the values of parameters not defined in the configuration to the default" >> {
+      val spec = genericSpec.copy(patterns = Set(patternSpecification1))
+
+      val confPattern = patternDef1.copy(parameters = Some(Set(paramDef1)))
+      val conf = Some(List(confPattern))
+
+      val result = conf.withDefaultParameters(spec)
+
+      result must beEqualTo(
+        Some(List(confPattern.copy(parameters = Some(Set(paramDef1, paramDef2.copy(value = paramSpec2.default))))))
+      )
+    }
   }
 }
