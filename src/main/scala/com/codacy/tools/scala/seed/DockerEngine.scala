@@ -19,11 +19,10 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
 ) extends Delayable
     with Haltable {
 
-  @SuppressWarnings(Array("CatchThrowable"))
   def main(args: Array[String]): Unit = {
     initTimeout(timeout)
 
-    for {
+    val result = (for {
       specification <- dockerEnvironment.specification(specificationFile)
       configurations <- dockerEnvironment.configurations(configFile)
     } yield {
@@ -33,22 +32,30 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
 
       printer.info("Going to run tool")
 
-      // We need to catch Throwable here to avoid JVM crashes
-      // Crashes can lead to docker not exiting properly
-      val result = try {
-        tool.apply(source = Source.Directory(rootFile.toString),
-                   configuration = toolConfiguration,
-                   files = files,
-                   options = toolOptions)(specification)
-      } catch {
-        case t: Throwable =>
-          Failure(t)
-      }
+      executeTool(specification, toolConfiguration, files, toolOptions)
+    }).flatten
 
-      printResults(result)
-    }
-
+    printResults(result)
     ()
+  }
+
+  @SuppressWarnings(Array("CatchThrowable"))
+  private def executeTool(specification: Tool.Specification,
+                          toolConfiguration: Option[List[Pattern.Definition]],
+                          files: Option[Set[Source.File]],
+                          toolOptions: Map[Options.Key, Options.Value]) = {
+    // We need to catch Throwable here to avoid JVM crashes
+    // Crashes can lead to docker not exiting properly
+    val result = try {
+      tool.apply(source = Source.Directory(rootFile.toString),
+                 configuration = toolConfiguration,
+                 files = files,
+                 options = toolOptions)(specification)
+    } catch {
+      case t: Throwable =>
+        Failure(t)
+    }
+    result
   }
 
   private def initTimeout(duration: FiniteDuration): Future[Unit] = {
