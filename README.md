@@ -141,8 +141,9 @@ and check them with the tool's native configuration file, if it is supported and
     * Info
     
     For category types we have:
-    * ErrorProne 
-    * CodeStyle 
+    * ErrorProne
+    * CodeStyle
+    * Complexity
     * UnusedCode
     * Security
     * Compatibility
