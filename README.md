@@ -149,6 +149,7 @@ and check them with the tool's native configuration file, if it is supported and
     * Compatibility
     * Performance
     * Documentation
+    * BestPractice
 
 3. Write the code to run the tool
 You don't have to use this seed and you can write the code in any language you want but, you have to invoke the tool according to the configuration.
