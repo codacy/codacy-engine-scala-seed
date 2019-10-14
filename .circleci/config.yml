@@ -22,19 +22,19 @@ references:
   restore_source_code: &restore_source_code
     restore_cache:
       keys:
-        - source-code-1.0.0-{{ .Branch }}-{{ .Revision }}
-        - source-code-1.0.0-{{ .Branch }}
-        - source-code-1.0.0
+        - source-code-1.0.1-{{ .Branch }}-{{ .Revision }}
+        - source-code-1.0.1-{{ .Branch }}
+        - source-code-1.0.1
   restore_dependencies: &restore_dependencies
     restore_cache:
       keys:
-        - sbt-ivy2-dependencies-1.0.0-{{ checksum "/tmp/dependencies.cache.tmp" }}
-        - sbt-ivy2-dependencies-1.0.0
+        - sbt-ivy2-dependencies-1.0.1-{{ checksum "/tmp/dependencies.cache.tmp" }}
+        - sbt-ivy2-dependencies-1.0.1
   restore_build: &restore_build
     restore_cache:
       keys:
-        - sbt-build-1.0.0-{{ .Branch }}-{{ .Revision }}
-        - sbt-build-1.0.0
+        - sbt-build-1.0.1-{{ .Branch }}-{{ .Revision }}
+        - sbt-build-1.0.1
 
   setup_dependencies_key: &setup_dependencies_key
     run:
@@ -52,7 +52,7 @@ jobs:
       - *restore_source_code
       - checkout
       - save_cache:
-          key: source-code-1.0.0-{{ .Branch }}-{{ .Revision }}
+          key: source-code-1.0.1-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/workdir
 
@@ -70,7 +70,7 @@ jobs:
           paths:
             - ~/.ivy2
             - ~/.sbt
-          key: sbt-ivy2-dependencies-1.0.0-{{ checksum "/tmp/dependencies.cache.tmp" }}
+          key: sbt-ivy2-dependencies-1.0.1-{{ checksum "/tmp/dependencies.cache.tmp" }}
 
   compile:
     <<: *default_java_job
@@ -86,7 +86,7 @@ jobs:
           paths:
             - ~/workdir/target
             - ~/workdir/project/target
-          key: sbt-build-1.0.0-{{ .Branch }}-{{ .Revision }}
+          key: sbt-build-1.0.1-{{ .Branch }}-{{ .Revision }}
 
   test:
     <<: *default_java_job
