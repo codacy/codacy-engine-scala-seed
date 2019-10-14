@@ -3,4 +3,3 @@
 set -e
 
 sbt scalafmtCheck
-sbt scapegoat

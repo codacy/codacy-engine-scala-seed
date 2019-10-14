@@ -27,8 +27,6 @@ lazy val codacyEngineScalaSeed = project
     )
   )
 
-scapegoatVersion in ThisBuild := "1.3.10"
-
 // Sonatype repository settings
 credentials += Credentials("Sonatype Nexus Repository Manager",
                            "oss.sonatype.org",
