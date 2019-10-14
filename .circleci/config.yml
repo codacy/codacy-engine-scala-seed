@@ -33,8 +33,8 @@ references:
   restore_build: &restore_build
     restore_cache:
       keys:
-        - sbt-build-1.0.1-{{ .Branch }}-{{ .Revision }}
-        - sbt-build-1.0.1
+        - sbt-build1-1.0.1-{{ .Branch }}-{{ .Revision }}
+        - sbt-build1-1.0.1
 
   setup_dependencies_key: &setup_dependencies_key
     run:
@@ -85,7 +85,7 @@ jobs:
           paths:
             - ~/workdir/target
             - ~/workdir/project/target
-          key: sbt-build-1.0.1-{{ .Branch }}-{{ .Revision }}
+          key: sbt-build1-1.0.1-{{ .Branch }}-{{ .Revision }}
 
   test:
     <<: *default_java_job
