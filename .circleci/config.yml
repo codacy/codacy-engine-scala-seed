@@ -42,8 +42,7 @@ references:
       command: |
         shasum build.sbt \
           project/plugins.sbt \
-          project/build.properties \
-          project/Dependencies.scala > /tmp/dependencies.cache.tmp
+          project/build.properties > /tmp/dependencies.cache.tmp
 
 jobs:
   checkout_code:
