@@ -3,8 +3,8 @@ package com.codacy.plugins
 import com.codacy.plugins.api.languages.{Language, Languages}
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
 import play.api.libs.json.{JsResult, _}
-
 import scala.language.implicitConversions
+
 import scala.util.Try
 
 package object api {
@@ -74,13 +74,16 @@ package object api {
 
   implicit lazy val patternLanguageFormat: Format[Language] =
     Format(
-      {
-        Reads.StringReads.reads(_).flatMap { string =>
-          Languages
-            .fromName(string)
-            .fold[JsResult[Language]](JsError(s"Could not find language for name $string"))(JsSuccess(_))
-        }
-      },
+      Reads(
+        Reads.StringReads
+          .reads(_)
+          .flatMap(
+            string =>
+              Languages
+                .fromName(string)
+                .fold[JsResult[Language]](JsError(s"Could not find language for name $string"))(JsSuccess(_))
+          )
+      ),
       Writes((v: Language) => Json.toJson(v.name))
     )
 
