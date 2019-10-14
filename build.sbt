@@ -27,8 +27,6 @@ lazy val codacyEngineScalaSeed = project
     )
   )
 
-// Scapegoat
-scapegoatDisabledInspections in ThisBuild := Seq()
 scapegoatVersion in ThisBuild := "1.3.10"
 
 // Sonatype repository settings
