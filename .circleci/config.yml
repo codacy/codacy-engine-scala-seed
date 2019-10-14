@@ -16,7 +16,7 @@ workflows:
                  scalafmt::test;
                  test:scalafmt::test;
                  sbt:scalafmt::test;
-                 test;
+                 +test;
                  coverage;
                  coverageReport;
                  coverageAggregate"
