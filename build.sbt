@@ -1,33 +1,34 @@
 import sbt._
 import sbt.Keys._
 
-val scalaBinaryVersionNumber = "2.12"
-val scalaVersionNumber = s"$scalaBinaryVersionNumber.4"
+val scala211 = "2.11.12"
+val scala212 = "2.12.10"
+val scala213 = "2.13.1"
 
 lazy val codacyEngineScalaSeed = project
   .in(file("."))
   .settings(
     inThisBuild(
-      List(organization := "com.codacy",
-           scalaVersion := scalaVersionNumber,
-           version := "1.0.0-SNAPSHOT",
-           scalacOptions ++= Common.compilerFlags,
-           scalacOptions in Test ++= Seq("-Yrangepos"),
-           scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings"))
+      Seq(
+        organization := "com.codacy",
+        scalaVersion := scala212,
+        crossScalaVersions := Seq(scala211, scala212, scala213)
+      )
     ),
     name := "codacy-engine-scala-seed",
     // App Dependencies
-    libraryDependencies ++= Seq(Dependencies.playJson, Dependencies.codacyPluginsApi, Dependencies.betterFiles),
+    libraryDependencies ++= Seq(
+      Dependencies.playJson,
+      Dependencies.codacyPluginsApi,
+      Dependencies.betterFiles
+    ),
     // Test Dependencies
     libraryDependencies ++= Dependencies.specs2
   )
-  .settings(Common.genericSettings: _*)
 
 // Scapegoat
-scalaVersion in ThisBuild := scalaVersionNumber
-scalaBinaryVersion in ThisBuild := scalaBinaryVersionNumber
 scapegoatDisabledInspections in ThisBuild := Seq()
-scapegoatVersion in ThisBuild := "1.3.5"
+scapegoatVersion in ThisBuild := "1.3.10"
 
 // Sonatype repository settings
 credentials += Credentials("Sonatype Nexus Repository Manager",

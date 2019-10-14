@@ -2,5 +2,5 @@
 
 set -e
 
-sbt compile
-sbt test:compile
+sbt +compile
+sbt +test:compile

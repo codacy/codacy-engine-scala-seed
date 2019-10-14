@@ -15,6 +15,8 @@ import play.api.libs.json.Json
 
 import scala.concurrent.duration._
 import scala.util.{Failure, Random, Success, Try}
+import com.codacy.plugins.api.results.Result
+import org.mockito.stubbing.Answer
 
 class DockerEngineSpecs extends Specification with Mockito {
 
@@ -57,12 +59,8 @@ class DockerEngineSpecs extends Specification with Mockito {
       val fileName = "a.scala"
       val result = FileError(Source.File(fileName), Option.empty[ErrorMessage])
       val tool = mock[Tool]
-      when(
-        tool
-          .apply(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec)
-      ).thenAnswer((invocation: InvocationOnMock) => {
-        Success(List(result))
-      })
+      when(tool(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec))
+        .thenAnswer(new Answer[Try[List[Result]]] { def answer(invocation: InvocationOnMock) = Success(List(result)) })
       val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, dockerEnvironment.defaultTimeout))
 
       //when
@@ -95,12 +93,10 @@ class DockerEngineSpecs extends Specification with Mockito {
       val tool = mock[Tool]
       val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, dockerEnvironment.defaultTimeout))
 
-      when(
-        tool
-          .apply(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec)
-      ).thenAnswer((invocation: InvocationOnMock) => {
-        Failure(new Throwable(failedMsg))
-      })
+      when(tool(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec))
+        .thenAnswer(new Answer[Try[List[Result]]] {
+          def answer(invocation: InvocationOnMock) = Failure(new Throwable(failedMsg))
+        })
 
       //when
       dockerEngine.main(Array.empty)
@@ -127,12 +123,10 @@ class DockerEngineSpecs extends Specification with Mockito {
       }
 
       val tool = mock[Tool]
-      when(
-        tool
-          .apply(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec)
-      ).thenAnswer((invocation: InvocationOnMock) => {
-        sleep
-      })
+      when(tool(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec))
+        .thenAnswer(new Answer[Try[List[Result]]] {
+          def answer(invocation: InvocationOnMock) = sleep
+        })
 
       val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, 3.seconds))
 
@@ -142,7 +136,5 @@ class DockerEngineSpecs extends Specification with Mockito {
       //then
       there.was(one(dockerEngine).halt(2))
     }
-
   }
-
 }

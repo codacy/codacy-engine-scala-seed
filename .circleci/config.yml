@@ -43,7 +43,6 @@ references:
         shasum build.sbt \
           project/plugins.sbt \
           project/build.properties \
-          project/Common.scala \
           project/Dependencies.scala > /tmp/dependencies.cache.tmp
 
 jobs:
