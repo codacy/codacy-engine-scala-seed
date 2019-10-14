@@ -3,6 +3,7 @@ package com.codacy.plugins
 import com.codacy.plugins.api.languages.{Language, Languages}
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
 import play.api.libs.json.{JsResult, _}
+import scala.language.implicitConversions
 
 import scala.util.Try
 
