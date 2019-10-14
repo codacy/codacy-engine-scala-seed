@@ -15,9 +15,11 @@ workflows:
             sbt "set scalafmtUseIvy in ThisBuild := false;
                  scalafmt::test;
                  test:scalafmt::test;
-                 sbt:scalafmt::test;
-                 +test;
-                 coverage;
+                 sbt:scalafmt::test"
+            sbt ++2.11.12 test
+            sbt ++2.12.10 test
+            sbt ++2.13.1 test
+            sbt "coverage;
                  coverageReport;
                  coverageAggregate"
             if [ -z "$CODACY_PROJECT_TOKEN" ]; then
