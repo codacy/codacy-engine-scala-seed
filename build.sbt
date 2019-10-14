@@ -15,3 +15,5 @@ libraryDependencies ++= Seq(("com.typesafe.play" %% "play-json" % "2.7.4").withS
                             ("com.github.pathikrit" %% "better-files" % "3.8.0").withSources(),
                             "org.specs2" %% "specs2-core" % specs2Version % Test,
                             "org.specs2" %% "specs2-mock" % specs2Version % Test)
+
+scalacOptions := Seq()
