@@ -17,3 +17,15 @@ libraryDependencies ++= Seq(("com.typesafe.play" %% "play-json" % "2.7.4").withS
                             "org.specs2" %% "specs2-mock" % specs2Version % Test)
 
 scalacOptions := Seq()
+
+// HACK: This setting is not picked up properly from the plugin
+pgpPassphrase := Option(System.getenv("SONATYPE_GPG_PASSPHRASE")).map(_.toCharArray)
+
+description := "Library to develop Codacy tools"
+
+scmInfo := Some(
+  ScmInfo(url("https://github.com/codacy/codacy-engine-scala-seed"),
+          "scm:git:git@github.com:codacy/codacy-engine-scala-seed.git")
+)
+
+publicMvnPublish
