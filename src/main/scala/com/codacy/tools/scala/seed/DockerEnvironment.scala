@@ -10,6 +10,7 @@ import play.api.libs.json.Json
 
 import scala.concurrent.duration.{Duration, FiniteDuration, _}
 import scala.util.{Success, Try}
+import java.util.concurrent.TimeUnit
 
 class DockerEnvironment(variables: Map[String, String] = sys.env) {
 
@@ -19,13 +20,8 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
 
   val defaultTimeout: FiniteDuration =
     variables
-      .get("TIMEOUT")
-      .flatMap(
-        timeoutStrValue =>
-          Try(Duration(timeoutStrValue)).toOption.collect {
-            case d: FiniteDuration => d
-        }
-      )
+      .get("TIMEOUT_SECONDS")
+      .flatMap(timeoutStrValue => Try(FiniteDuration(timeoutStrValue.toLong, TimeUnit.SECONDS)).toOption)
       .getOrElse(15.minutes)
 
   val debug: Boolean =
