@@ -2,7 +2,7 @@ package com.codacy.tools.scala.seed.utils
 
 import com.codacy.plugins.api._
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
-import com.codacy.tools.scala.seed.utils.ToolHelper._
+import ToolHelper._
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsNumber, JsString}
 
@@ -14,10 +14,11 @@ class ToolHelperTest extends Specification {
   val patternSpecification1 = Pattern.Specification(Pattern.Id("id1"),
                                                     Result.Level.Warn,
                                                     Pattern.Category.CodeStyle,
+                                                    None,
                                                     Some(Set(paramSpec1, paramSpec2)))
 
   val patternSpecification2 =
-    Pattern.Specification(Pattern.Id("id2"), Result.Level.Warn, Pattern.Category.CodeStyle, None)
+    Pattern.Specification(Pattern.Id("id2"), Result.Level.Warn, Pattern.Category.CodeStyle, None, None)
   val patternsSpec = Set(patternSpecification1, patternSpecification2)
 
   val paramDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(33)))
