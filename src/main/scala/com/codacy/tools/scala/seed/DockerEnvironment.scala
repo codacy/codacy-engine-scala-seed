@@ -1,16 +1,15 @@
 package com.codacy.tools.scala.seed
 
 import java.nio.file.{Path, Paths}
-
+import scala.concurrent.duration._
+import scala.util.{Success, Try}
 import better.files._
+import play.api.libs.json.Json
 import com.codacy.plugins.api._
 import com.codacy.plugins.api.results.Tool
-import com.codacy.tools.scala.seed.traits.JsResultOps._
-import play.api.libs.json.Json
 
-import scala.concurrent.duration.{Duration, FiniteDuration, _}
-import scala.util.{Success, Try}
-import java.util.concurrent.TimeUnit
+import com.codacy.tools.scala.seed.traits.JsResultOps._
+import com.codacy.tools.scala.seed.utils.TimeoutHelper
 
 class DockerEnvironment(variables: Map[String, String] = sys.env) {
 
@@ -21,7 +20,7 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
   val defaultTimeout: FiniteDuration =
     variables
       .get("TIMEOUT_SECONDS")
-      .flatMap(timeoutStrValue => Try(FiniteDuration(timeoutStrValue.toLong, TimeUnit.SECONDS)).toOption)
+      .flatMap(TimeoutHelper.parseTimeout)
       .getOrElse(15.minutes)
 
   val debug: Boolean =
