@@ -5,7 +5,6 @@ import scala.util.Try
 import play.api.libs.json.{JsResult, _}
 import com.codacy.plugins.api.languages.{Language, Languages}
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
-import com.codacy.plugins.api.results.Pattern.{Category, Subcategory}
 
 package object api {
 
@@ -68,9 +67,9 @@ package object api {
   implicit lazy val resultLocaltionFormat: Format[Result.Location] =
     Json.format[Result.Location]
   implicit lazy val resultLevelFormat: Format[Result.Level.Value] =
-    Format(enumReads(Result.Level), enumWrites[Result.Level])
-  implicit lazy val patternCategoryFormat: Format[Pattern.Category.Value] =
-    Format(enumReads(Pattern.Category), enumWrites[Pattern.Category])
+    Json.formatEnum(Result.Level)
+  implicit lazy val patternCategoryFormat: Format[Pattern.Category] =
+    Json.formatEnum(Pattern.Category)
 
   implicit lazy val patternLanguageFormat: Format[Language] =
     Format(
@@ -129,48 +128,11 @@ package object api {
   implicit lazy val parameterDefinitionFormat: Format[Parameter.Definition] = Json.format[Parameter.Definition]
   implicit lazy val patternDefinitionFormat: Format[Pattern.Definition] = Json.format[Pattern.Definition]
 
-  /**
-    * Defines how a Pattern.Subcategory object should be written/read to/from json.
-    */
-  implicit lazy val patternSubCategoryFormat: Format[Pattern.Subcategory.Value] =
-    Format(enumReads(Pattern.Subcategory), enumWrites[Pattern.Subcategory])
+  implicit lazy val patternSubCategoryFormat: Format[Pattern.Subcategory] =
+    Json.formatEnum(Pattern.Subcategory)
 
-  /**
-    * Defines how a [[Pattern.Specification]] object should be written to json.
-    */
-  private val patternSpecificationWrites: Writes[Pattern.Specification] = new Writes[Pattern.Specification] {
-    override def writes(spec: Pattern.Specification): JsValue =
-      Json.obj("patternId" -> Json.toJson(spec.patternId),
-               "level" -> Json.toJson(spec.level),
-               "category" -> Json.toJson(spec.category),
-               "subcategory" -> Json.toJson(spec.subcategory),
-               "parameters" -> Json.toJson(spec.parameters),
-               "languages" -> Json.toJson(spec.languages))
-  }
-
-  /**
-    * Defines how a [[Pattern.Specification]] object should be read from json.
-    */
-  private val patternSpecificationReads: Reads[Pattern.Specification] = new Reads[Pattern.Specification] {
-    override def reads(json: JsValue): JsResult[Pattern.Specification] = {
-      JsSuccess(
-        Pattern.Specification((json \ "patternId").as[Pattern.Id],
-                              (json \ "level").as[Result.Level],
-                              (json \ "category").as[Category],
-                              (json \ "subcategory").asOpt[Subcategory],
-                              (json \ "parameters").asOpt[Set[Parameter.Specification]],
-                              (json \ "languages").asOpt[Set[Language]])
-      )
-    }
-  }
-
-  /**
-    * Aggregates the Reads and Writes objects for Pattern.Specification.
-    * @note This seems to be required since Json.format[Pattern.Specification]
-    *       doesn't seem to be able to serialize/deserialize automatically.
-    */
   implicit lazy val patternSpecificationFormat: Format[Pattern.Specification] =
-    Format(patternSpecificationReads, patternSpecificationWrites)
+    Json.format[Pattern.Specification]
 
   implicit lazy val toolConfigurationFormat: Format[Tool.Configuration] = Json.format[Tool.Configuration]
 
