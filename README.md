@@ -18,7 +18,7 @@ For more details and examples of tools that use this project, you can check:
 Add to your SBT dependencies:
 
 ```scala
-"com.codacy" % "codacy-engine-scala-seed_2.12" % "<VERSION>"
+"com.codacy" %% "codacy-engine-scala-seed" % "<VERSION>"
 ```
 
 ## Docs
