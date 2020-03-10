@@ -19,11 +19,7 @@ workflows:
                  +test;
                  coverage;
                  coverageReport"
-            if [ -z "$CODACY_PROJECT_TOKEN" ]; then
-              echo "CODACY_PROJECT_TOKEN not found. Skipping send coverage to Codacy."
-            else
-              bash <(curl -Ls https://coverage.codacy.com/get.sh)
-            fi
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report --skip
           persist_to_workspace: true
           requires:
             - codacy/checkout_and_version
