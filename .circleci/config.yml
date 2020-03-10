@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  codacy: codacy/base@2.0.1
+  codacy: codacy/base@2.7.0
 
 workflows:
   version: 2
@@ -12,20 +12,17 @@ workflows:
       - codacy/sbt:
           name: compile_test
           cmd: |
-            sbt "set scalafmtUseIvy in ThisBuild := false;
+            sbt -mem 2048 "set scalafmtUseIvy in ThisBuild := false;
                  scalafmt::test;
                  test:scalafmt::test;
-                 sbt:scalafmt::test"
-            sbt ++2.11.12 test
-            sbt ++2.12.10 test
-            sbt ++2.13.1 test
-            sbt "coverage;
-                 coverageReport;
-                 coverageAggregate"
+                 sbt:scalafmt::test;
+                 +test;
+                 coverage;
+                 coverageReport"
             if [ -z "$CODACY_PROJECT_TOKEN" ]; then
               echo "CODACY_PROJECT_TOKEN not found. Skipping send coverage to Codacy."
             else
-              sbt codacyCoverage
+              bash <(curl -Ls https://coverage.codacy.com/get.sh)
             fi
           persist_to_workspace: true
           requires:
@@ -34,7 +31,7 @@ workflows:
           name: publish_sonatype
           context: CodacyAWS
           cmd: |
-            sbt "retrieveGPGKeys;+publishSigned;sonatypeReleaseAll"
+            sbt retrieveGPGKeys +publishSigned sonatypeBundleRelease
           requires:
             - compile_test
           filters:
