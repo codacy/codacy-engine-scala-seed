@@ -1,7 +1,7 @@
 # Engine Scala Seed
 
-[![Codacy Badge](https://api.codacy.com/project/badge/grade/bc3a79d1b12649158a1eb4758e872141)](https://www.codacy.com/app/Codacy/codacy-engine-scala-seed)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/bc3a79d1b12649158a1eb4758e872141)](https://www.codacy.com/app/Codacy/codacy-engine-scala-seed?utm_source=github.com&utm_medium=referral&utm_content=codacy/codacy-engine-scala-seed&utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bc3a79d1b12649158a1eb4758e872141)](https://www.codacy.com/gh/codacy/codacy-engine-scala-seed?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=codacy/codacy-engine-scala-seed&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/bc3a79d1b12649158a1eb4758e872141)](https://www.codacy.com/gh/codacy/codacy-engine-scala-seed?utm_source=github.com&utm_medium=referral&utm_content=codacy/codacy-engine-scala-seed&utm_campaign=Badge_Coverage)
 [![Build Status](https://circleci.com/gh/codacy/codacy-engine-scala-seed.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/codacy-engine-scala-seed)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.codacy/codacy-engine-scala-seed_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.codacy/codacy-engine-scala-seed_2.12)
 
