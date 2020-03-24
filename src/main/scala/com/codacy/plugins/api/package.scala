@@ -5,6 +5,7 @@ import scala.util.Try
 import play.api.libs.json.{JsResult, _}
 import com.codacy.plugins.api.languages.{Language, Languages}
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
+import scala.collection.immutable.SortedSet
 
 package object api {
 
@@ -136,16 +137,16 @@ package object api {
 
   implicit lazy val toolConfigurationFormat: Format[Tool.Configuration] = Json.format[Tool.Configuration]
 
-  implicit lazy val specificationFormat: Format[Tool.Specification] =
-    Format[Tool.Specification](Json.reads[Tool.Specification],
-                               Writes[Tool.Specification] { s =>
-                                 JsObject(
-                                   Map("name" -> implicitly[Writes[Tool.Name]].writes(s.name),
-                                       "version" -> implicitly[Writes[Option[Tool.Version]]].writes(s.version),
-                                       "patterns" -> implicitly[Writes[List[Pattern.Specification]]]
-                                         .writes(s.patterns.toList.sortBy(_.patternId.value)))
-                                 )
-                               })
+  implicit lazy val specificationFormat: Format[Tool.Specification] = {
+    val reads = Json.reads[Tool.Specification]
+    val writes = Json.writes[Tool.Specification].contramap { (s: Tool.Specification) =>
+      val patternsOrdering = Ordering.by[Pattern.Specification, String](_.patternId.value)
+      val emptySortedSet = SortedSet.empty[Pattern.Specification](patternsOrdering)
+      s.copy(patterns = emptySortedSet ++ s.patterns)
+    }
+    Format[Tool.Specification](reads, writes)
+  }
+
   implicit lazy val configurationOptionsKeyFormat: Format[Options.Key] = Json.format[Options.Key]
   implicit lazy val configurationOptionsFormat: Format[Map[Options.Key, Options.Value]] =
     Format[Map[Options.Key, Options.Value]](
