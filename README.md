@@ -9,7 +9,7 @@ Framework to help integration with external analysis tools at Codacy.
 These tools provide the issues you can see on Codacy after an analysis is completed.
 
 For more details and examples of tools that use this project, you can check:
-* [PMDJava](https://github.com/codacy/codacy-pmdjava)
+* [PMD](https://github.com/codacy/codacy-pmd)
 * [ESLint](https://github.com/codacy/codacy-eslint)
 * [Pylint](https://github.com/codacy/codacy-pylint)
 
