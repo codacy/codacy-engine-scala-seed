@@ -133,7 +133,7 @@ package object api {
     Json.formatEnum(Pattern.Subcategory)
 
   implicit lazy val patternSpecificationFormat: Format[Pattern.Specification] =
-    Json.format[Pattern.Specification]
+    Json.using[Json.WithDefaultValues].format[Pattern.Specification]
 
   implicit lazy val toolConfigurationFormat: Format[Tool.Configuration] = Json.format[Tool.Configuration]
 

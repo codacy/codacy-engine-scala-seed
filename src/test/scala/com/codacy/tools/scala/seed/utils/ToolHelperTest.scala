@@ -15,19 +15,19 @@ class ToolHelperTest extends Specification {
                                                     Result.Level.Warn,
                                                     Pattern.Category.CodeStyle,
                                                     None,
-                                                    Some(Set(paramSpec1, paramSpec2)))
+                                                    Set(paramSpec1, paramSpec2))
 
   val patternSpecification2 =
-    Pattern.Specification(Pattern.Id("id2"), Result.Level.Warn, Pattern.Category.CodeStyle, None, None)
+    Pattern.Specification(Pattern.Id("id2"), Result.Level.Warn, Pattern.Category.CodeStyle, None, Set.empty)
   val patternsSpec = Set(patternSpecification1, patternSpecification2)
 
   val paramDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(33)))
   val paramDef2 = Parameter.Definition(Parameter.Name("param2"), Parameter.Value(JsString("value33")))
-  val patternDef1 = Pattern.Definition(Pattern.Id("id1"), Some(Set(paramDef1, paramDef2)))
-  val patternDef2 = Pattern.Definition(Pattern.Id("id2"), None)
+  val patternDef1 = Pattern.Definition(Pattern.Id("id1"), Set(paramDef1, paramDef2))
+  val patternDef2 = Pattern.Definition(Pattern.Id("id2"), Set.empty)
 
-  val patternDef1NoParam = Pattern.Definition(Pattern.Id("id1"), None)
-  val patternDef2NoParam = Pattern.Definition(Pattern.Id("id2"), None)
+  val patternDef1NoParam = Pattern.Definition(Pattern.Id("id1"), Set.empty)
+  val patternDef2NoParam = Pattern.Definition(Pattern.Id("id2"), Set.empty)
 
   val genericSpec = Tool.Specification(Tool.Name("tool1"), Option(Tool.Version("0.15.6")), patternsSpec)
   val genericConf: Option[List[Pattern.Definition]] = Some(List(patternDef1, patternDef2))
@@ -67,8 +67,8 @@ class ToolHelperTest extends Specification {
 
       val expectedParamDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(2)))
       val expectedParamDef2 = Parameter.Definition(Parameter.Name("param2"), Parameter.Value(JsString("value2")))
-      val expectedPatternDef1 = Pattern.Definition(Pattern.Id("id1"), Some(Set(expectedParamDef1, expectedParamDef2)))
-      val expectedPatternDef2 = Pattern.Definition(Pattern.Id("id2"), None)
+      val expectedPatternDef1 = Pattern.Definition(Pattern.Id("id1"), Set(expectedParamDef1, expectedParamDef2))
+      val expectedPatternDef2 = Pattern.Definition(Pattern.Id("id2"), Set.empty)
       val expectedResult = Some(List(expectedPatternDef1, expectedPatternDef2))
 
       val result = conf.withDefaultParameters(spec)
@@ -79,13 +79,13 @@ class ToolHelperTest extends Specification {
     "set the values of parameters not defined in the configuration to the default" >> {
       val spec = genericSpec.copy(patterns = Set(patternSpecification1))
 
-      val confPattern = patternDef1.copy(parameters = Some(Set(paramDef1)))
+      val confPattern = patternDef1.copy(parameters = Set(paramDef1))
       val conf = Some(List(confPattern))
 
       val result = conf.withDefaultParameters(spec)
 
       result must beEqualTo(
-        Some(List(confPattern.copy(parameters = Some(Set(paramDef1, paramDef2.copy(value = paramSpec2.default))))))
+        Some(List(confPattern.copy(parameters = Set(paramDef1, paramDef2.copy(value = paramSpec2.default)))))
       )
     }
   }
