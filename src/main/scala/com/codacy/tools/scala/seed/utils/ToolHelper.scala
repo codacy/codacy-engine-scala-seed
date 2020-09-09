@@ -4,7 +4,7 @@ import com.codacy.plugins.api.results.{Parameter, Pattern, Tool}
 
 object ToolHelper {
 
-  implicit class ConfigurationOps(val configuration: Option[List[Pattern.Definition]]) extends AnyVal {
+  implicit class ConfigurationOps(private val configuration: Option[List[Pattern.Definition]]) extends AnyVal {
 
     def withDefaultParameters(implicit spec: Tool.Specification): Option[List[Pattern.Definition]] = {
       configuration.map(_.map { pattern =>
@@ -19,13 +19,11 @@ object ToolHelper {
     }
   }
 
-  implicit class ParameterSpecificationOps(val parameterSpec: Parameter.Specification) extends AnyVal {
+  implicit class ParameterSpecificationOps(private val parameterSpec: Parameter.Specification) extends AnyVal {
     def toDefinition: Parameter.Definition = Parameter.Definition(parameterSpec.name, parameterSpec.default)
   }
 
-  private def defaultParameters(
-    patternId: Pattern.Id
-  )(implicit spec: Tool.Specification): Set[Parameter.Definition] = {
+  private def defaultParameters(patternId: Pattern.Id)(implicit spec: Tool.Specification): Set[Parameter.Definition] = {
     spec.patterns
       .find(_.patternId == patternId)
       .map { patternSpec =>

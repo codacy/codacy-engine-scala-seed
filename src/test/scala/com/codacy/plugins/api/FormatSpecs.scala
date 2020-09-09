@@ -12,9 +12,10 @@ class FormatSpecs extends Specification {
       val category = Pattern.Category.CodeStyle
 
       val json = s"""{"patternId": "$patternId", "level": "$level", "category": "$category"}"""
-      
+
       val result = Json.parse(json).as[Pattern.Specification]
-      val expectedResult = Pattern.Specification(Pattern.Id(patternId), level, category, None, Set.empty, Set.empty, false)
+      val expectedResult =
+        Pattern.Specification(Pattern.Id(patternId), level, category, None, Set.empty, Set.empty, false)
 
       result shouldEqual expectedResult
     }
