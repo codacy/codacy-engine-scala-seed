@@ -24,14 +24,14 @@ package object api {
   }
 
   @SuppressWarnings(Array("UnusedMethodParameter"))
-  implicit class ParameterExtensions(param: Parameter.type) {
+  implicit class ParameterExtensions(private val param: Parameter.type) extends AnyVal {
     def Value(jsValue: JsValue): Parameter.Value = ParamValue(jsValue)
 
     def Value(raw: String): Parameter.Value = Value(Try(Json.parse(raw)).getOrElse(JsString(raw)))
   }
 
   @SuppressWarnings(Array("UnusedMethodParameter"))
-  implicit class OptionsExtensions(config: Options.type) {
+  implicit class OptionsExtensions(private val config: Options.type) extends AnyVal {
     def Value(jsValue: JsValue): Options.Value = OptionsValue(jsValue)
 
     def Value(raw: String): Options.Value = Value(Try(Json.parse(raw)).getOrElse(JsString(raw)))
@@ -133,7 +133,7 @@ package object api {
     Json.formatEnum(Pattern.Subcategory)
 
   implicit lazy val patternSpecificationFormat: Format[Pattern.Specification] =
-    Json.format[Pattern.Specification]
+    Json.using[Json.WithDefaultValues].format[Pattern.Specification]
 
   implicit lazy val toolConfigurationFormat: Format[Tool.Configuration] = Json.format[Tool.Configuration]
 
