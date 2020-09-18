@@ -127,7 +127,8 @@ package object api {
 
   implicit lazy val parameterSpecificationFormat: Format[Parameter.Specification] = Json.format[Parameter.Specification]
   implicit lazy val parameterDefinitionFormat: Format[Parameter.Definition] = Json.format[Parameter.Definition]
-  implicit lazy val patternDefinitionFormat: Format[Pattern.Definition] = Json.format[Pattern.Definition]
+  implicit lazy val patternDefinitionFormat: Format[Pattern.Definition] =
+    Json.using[Json.WithDefaultValues].format[Pattern.Definition]
 
   implicit lazy val patternSubCategoryFormat: Format[Pattern.Subcategory] =
     Json.formatEnum(Pattern.Subcategory)
