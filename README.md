@@ -25,15 +25,6 @@ Add to your SBT dependencies:
 
 ### How to integrate an external analysis tool on Codacy
 
-By creating a docker and writing code to handle the tool invocation and output,
-you can integrate the tool of your choice on Codacy!
-
-> To know more about dockers, and how to write a docker file please refer to [https://docs.docker.com/reference/builder/](https://docs.docker.com/reference/builder/)
-
-In this tutorial, we explain how you can integrate an analysis tool of your choice in Codacy.
-You can check the code of an already implemented tool and, if you wish, fork it to start your own.
-You are free to modify and use it for your own tools.
-
 #### Requirements
 
 * Docker definition with the tool you want to integrate
@@ -41,7 +32,7 @@ You are free to modify and use it for your own tools.
 
 #### Assumptions and Behaviour
 
-* To run the tool we provide the configuration file, `/.codacyrc`, with the language to run and optional parameters your tool might need.
+* To run the tool we provide the configuration file, `/.codacyrc`, with the language to run and optional parameters a tool might need.
 * The source code to be analysed will be located in `/src`, meaning that when provided in the configuration, the file paths are relative to `/src`.
 
 * **Structure of the .codacyrc file:**
@@ -235,7 +226,7 @@ You should explain the what and why of the issue. Adding an example is always a 
 
 Follow the instructions at [codacy-plugins-test](https://github.com/codacy/codacy-plugins-test/blob/master/README.md#test-definition).
 
-## Submit the docker
+## Dockerizing
 
 **Running the docker**
 ```bash
@@ -252,15 +243,6 @@ docker run -t \
 **Docker restrictions**
 * Docker image size should not exceed 500MB
 * Docker should contain a non-root user named docker with UID/GID 2004
-* All the source code of the docker must be public
-* The docker base must officially be supported on DockerHub
-* Your docker must be provided in a repository through a public git host (ex: GitHub, Bitbucket, ...)
-
-**Docker submission**
-* To submit the docker you should send an email to support@codacy.com with the link to the git repository with your docker definition.
-* The docker will then be subjected to a review by our team and we will then contact you with more details.
-
-If you have any question or suggestion regarding this guide please contact us at support@codacy.com.
 
 ## What is Codacy
 
