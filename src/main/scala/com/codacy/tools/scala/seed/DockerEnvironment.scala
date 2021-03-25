@@ -17,11 +17,10 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
   val configFile: File = Paths.get("/.codacyrc")
   val specificationFile: File = Paths.get("/docs/patterns.json")
 
-  val timeout: FiniteDuration =
+  val timeout: Option[FiniteDuration] =
     variables
       .get("TIMEOUT_SECONDS")
       .flatMap(TimeoutHelper.parseTimeout)
-      .getOrElse(15.minutes)
 
   val debug: Boolean =
     variables.get("DEBUG").flatMap(debugStrValue => Try(debugStrValue.toBoolean).toOption).getOrElse(false)

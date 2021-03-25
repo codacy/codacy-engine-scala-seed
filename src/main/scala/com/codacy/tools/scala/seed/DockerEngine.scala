@@ -15,7 +15,12 @@ abstract class DockerEngine(tool: Tool, env: DockerEnvironment = new DockerEnvir
     with Haltable {
 
   def main(args: Array[String]): Unit = {
-    initTimeout(env.timeout)
+    env.timeout match {
+      case Some(timeout) =>
+        initTimeout(timeout)
+      case _ =>
+        printer.debug("There is no internal timeout set")
+    }
 
     val result = (for {
       specification <- env.specification
