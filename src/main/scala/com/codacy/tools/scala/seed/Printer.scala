@@ -12,7 +12,7 @@ class Printer(infoStream: PrintStream = Console.out,
               errStream: PrintStream = Console.err,
               dockerEnvironment: DockerEnvironment = new DockerEnvironment()) {
 
-  def info(message: String, error: Option[Throwable] = Option.empty[Throwable]): Unit = {
+  def debug(message: String, error: Option[Throwable] = Option.empty[Throwable]): Unit = {
     if (dockerEnvironment.debug) {
       infoStream.println(message)
       error.foreach(_.printStackTrace(infoStream))

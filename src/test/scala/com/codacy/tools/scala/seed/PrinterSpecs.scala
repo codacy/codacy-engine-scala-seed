@@ -19,7 +19,7 @@ class PrinterSpecs extends Specification {
       val printer = new Printer(printStream)
       val dockerMetricsEnvironment = new DockerEnvironment(Map.empty)
       val fileName = "a.scala"
-      val sourcePath = dockerMetricsEnvironment.defaultRootFile
+      val sourcePath = dockerMetricsEnvironment.rootFile
       val result =
         Issue(Source.File("a.scala"), Result.Message("Found issue"), Pattern.Id("pattern-id"), Source.Line(1))
 

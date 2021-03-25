@@ -10,13 +10,15 @@ class DockerEnvironmentSpecs extends Specification {
 
   "DockerEnvironment" >> {
 
-    val dockerEnvironment = new DockerEnvironment(Map.empty)
-
     "get the tool configuration, given a valid json file" >> {
       //given
       (for {
         tempFile <- File.temporaryFile()
       } yield {
+        val dockerEnvironment = new DockerEnvironment(Map.empty) {
+          override val configFile: File = tempFile
+        }
+
         val expectedConfiguration =
           Tool.CodacyConfiguration(Set.empty[Tool.Configuration],
                                    Some(Set(Source.File(s"${tempFile.parent.pathAsString}/a.scala"))),
@@ -24,7 +26,7 @@ class DockerEnvironmentSpecs extends Specification {
         tempFile.write(Json.stringify(Json.toJson(expectedConfiguration)))
 
         //when
-        val configurations = dockerEnvironment.configurations(tempFile)
+        val configurations = dockerEnvironment.configurations
 
         //then
         // scalafix:off NoInfer.any
@@ -38,11 +40,15 @@ class DockerEnvironmentSpecs extends Specification {
       (for {
         tempFile <- File.temporaryFile()
       } yield {
+        val dockerEnvironment = new DockerEnvironment(Map.empty) {
+          override val configFile: File = tempFile
+        }
+
         tempFile.write("{{invalid json}")
 
         //when
         val metricsConfig =
-          dockerEnvironment.configurations(tempFile)
+          dockerEnvironment.configurations
 
         //then
         metricsConfig must beFailedTry
@@ -51,11 +57,13 @@ class DockerEnvironmentSpecs extends Specification {
 
     "not return any configuration if the configuration file doesn't exist" >> {
       //given
-      val nonExistentFile = File("notExistentFile.xpto")
+      val dockerEnvironment = new DockerEnvironment(Map.empty) {
+        override val configFile: File = File("notExistentFile.xpto")
+      }
 
       //when
       val metricsConfig =
-        dockerEnvironment.configurations(nonExistentFile)
+        dockerEnvironment.configurations
 
       //then
       // scalafix:off NoInfer.any

@@ -2,7 +2,6 @@ package com.codacy.tools.scala.seed
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 
-import better.files.File
 import com.codacy.plugins.api.results.Result.FileError
 import com.codacy.plugins.api.results.{Pattern, Tool}
 import com.codacy.plugins.api.{ErrorMessage, Options, Source}
@@ -23,10 +22,10 @@ class DockerEngineSpecs extends Specification with Mockito {
   private val stubSpec =
     Tool.Specification(Tool.Name("Name"), Option(Tool.Version("1.0.0-SNAPSHOT")), Set.empty[Pattern.Specification])
 
-  class StubDockerEnvironment extends DockerEnvironment(Map.empty) {
-    override def specification(specificationPath: File): Try[Tool.Specification] =
+  class StubDockerEnvironment(variables: Map[String, String] = Map.empty) extends DockerEnvironment(variables) {
+    override def specification: Try[Tool.Specification] =
       Success(stubSpec)
-    override def configurations(configFile: File): Try[Option[Tool.CodacyConfiguration]] =
+    override def configurations: Try[Option[Tool.CodacyConfiguration]] =
       Success(
         Option(
           Tool.CodacyConfiguration(Set.empty[Tool.Configuration],
@@ -36,11 +35,8 @@ class DockerEngineSpecs extends Specification with Mockito {
       )
   }
 
-  class StubEngine(tool: Tool,
-                   dockerEnvironment: DockerEnvironment,
-                   printer: Printer,
-                   timeout: FiniteDuration = 10.minutes)
-      extends DockerEngine(tool, dockerEnvironment)(printer = printer, timeout = timeout) {
+  class StubEngine(tool: Tool, dockerEnvironment: DockerEnvironment, printer: Printer)
+      extends DockerEngine(tool, dockerEnvironment)(printer = printer) {
     override def halt(code: Int): Unit = ()
   }
 
@@ -61,7 +57,7 @@ class DockerEngineSpecs extends Specification with Mockito {
       val tool = mock[Tool]
       when(tool(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec))
         .thenAnswer(new Answer[Try[List[Result]]] { def answer(invocation: InvocationOnMock) = Success(List(result)) })
-      val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, dockerEnvironment.defaultTimeout))
+      val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer))
 
       //when
       dockerEngine.main(Array.empty)
@@ -69,9 +65,7 @@ class DockerEngineSpecs extends Specification with Mockito {
       //then
       Json.parse(outContent.toString) must beEqualTo(
         Json.toJson(
-          result.copy(
-            file = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString))
-          )
+          result.copy(file = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.rootFile.toString)))
         )
       )
       there.was(one(dockerEngine).halt(0))
@@ -91,7 +85,7 @@ class DockerEngineSpecs extends Specification with Mockito {
         new Printer(infoStream = outStream, errStream = errStream, dockerEnvironment = dockerEnvironment)
 
       val tool = mock[Tool]
-      val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, dockerEnvironment.defaultTimeout))
+      val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer))
 
       when(tool(Source.Directory("/src"), Option.empty, Option.empty, Map.empty)(stubSpec))
         .thenAnswer(new Answer[Try[List[Result]]] {
@@ -108,7 +102,7 @@ class DockerEngineSpecs extends Specification with Mockito {
 
     "fail if the configured timeout on the system environment is too low" >> {
       //given
-      val dockerEnvironment = new StubDockerEnvironment
+      val dockerEnvironment = new StubDockerEnvironment(Map("TIMEOUT_SECONDS" -> "3"))
 
       val outContent = new ByteArrayOutputStream()
       val outStream = new PrintStream(outContent)
@@ -128,7 +122,7 @@ class DockerEngineSpecs extends Specification with Mockito {
           def answer(invocation: InvocationOnMock) = sleep
         })
 
-      val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer, 3.seconds))
+      val dockerEngine = spy(new StubEngine(tool, dockerEnvironment, printer))
 
       //when
       dockerEngine.main(Array.empty)

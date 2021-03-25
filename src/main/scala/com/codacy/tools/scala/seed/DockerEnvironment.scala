@@ -13,11 +13,11 @@ import com.codacy.tools.scala.seed.utils.TimeoutHelper
 
 class DockerEnvironment(variables: Map[String, String] = sys.env) {
 
-  val defaultRootFile: Path = Paths.get("/src")
-  val defaultConfigFile: Path = Paths.get("/.codacyrc")
-  val defaultSpecificationFile: Path = Paths.get("/docs/patterns.json")
+  val rootFile: Path = Paths.get("/src")
+  val configFile: File = Paths.get("/.codacyrc")
+  val specificationFile: File = Paths.get("/docs/patterns.json")
 
-  val defaultTimeout: FiniteDuration =
+  val timeout: FiniteDuration =
     variables
       .get("TIMEOUT_SECONDS")
       .flatMap(TimeoutHelper.parseTimeout)
@@ -26,7 +26,7 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
   val debug: Boolean =
     variables.get("DEBUG").flatMap(debugStrValue => Try(debugStrValue.toBoolean).toOption).getOrElse(false)
 
-  def configurations(configFile: File = defaultConfigFile): Try[Option[Tool.CodacyConfiguration]] = {
+  def configurations: Try[Option[Tool.CodacyConfiguration]] = {
     if (configFile.exists) {
       for {
         content <- Try(configFile.byteArray)
@@ -38,9 +38,9 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
     }
   }
 
-  def specification(specificationPath: File = defaultSpecificationFile): Try[Tool.Specification] = {
+  def specification: Try[Tool.Specification] = {
     for {
-      content <- Try(specificationPath.byteArray)
+      content <- Try(specificationFile.byteArray)
       json <- Try(Json.parse(content))
       spec <- json.validate[Tool.Specification].asTry
     } yield spec

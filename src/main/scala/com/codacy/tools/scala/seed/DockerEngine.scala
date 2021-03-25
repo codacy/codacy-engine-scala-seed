@@ -1,36 +1,31 @@
 package com.codacy.tools.scala.seed
 
-import java.nio.file.{Path, Paths}
-
 import com.codacy.plugins.api.results.{Pattern, Result, Tool}
 import com.codacy.plugins.api.{Options, Source}
 import com.codacy.tools.scala.seed.traits.{Delayable, Haltable}
 
+import java.nio.file.Paths
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
-abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = new DockerEnvironment())(
-  rootFile: Path = dockerEnvironment.defaultRootFile,
-  configFile: Path = dockerEnvironment.defaultConfigFile,
-  specificationFile: Path = dockerEnvironment.defaultSpecificationFile,
-  timeout: FiniteDuration = dockerEnvironment.defaultTimeout,
-  printer: Printer = new Printer(dockerEnvironment = dockerEnvironment)
+abstract class DockerEngine(tool: Tool, env: DockerEnvironment = new DockerEnvironment())(
+  printer: Printer = new Printer(dockerEnvironment = env)
 ) extends Delayable
     with Haltable {
 
   def main(args: Array[String]): Unit = {
-    initTimeout(timeout)
+    initTimeout(env.timeout)
 
     val result = (for {
-      specification <- dockerEnvironment.specification(specificationFile)
-      configurations <- dockerEnvironment.configurations(configFile)
+      specification <- env.specification
+      configurations <- env.configurations
     } yield {
       val toolConfiguration = getToolConfiguration(specification, configurations)
       val files = getFiles(configurations)
       val toolOptions = getToolOptions(configurations)
 
-      printer.info("Going to run tool")
+      printer.debug("Going to run tool")
 
       executeTool(specification, toolConfiguration, files, toolOptions)
     }).flatten
@@ -47,7 +42,7 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
     // We need to catch Throwable here to avoid JVM crashes
     // Crashes can lead to docker not exiting properly
     val result = try {
-      tool.apply(source = Source.Directory(rootFile.toString),
+      tool.apply(source = Source.Directory(env.rootFile.toString),
                  configuration = toolConfiguration,
                  files = files,
                  options = toolOptions)(specification)
@@ -59,7 +54,7 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
   }
 
   private def initTimeout(duration: FiniteDuration): Future[Unit] = {
-    printer.info("Starting timeout")
+    printer.debug("Starting timeout")
     delay(duration)(halt(2))
   }
 
@@ -80,7 +75,7 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
       files <- configs.files
     } yield
       files.map { file =>
-        file.copy(path = rootFile.resolve(Paths.get(file.path)).toString)
+        file.copy(path = env.rootFile.resolve(Paths.get(file.path)).toString)
       }
   }
 
@@ -94,11 +89,11 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
   private def printResults(toolResult: Try[List[Result]]): Unit = {
     toolResult match {
       case Success(results) =>
-        printer.info(s"Got ${results.length} results")
+        printer.debug(s"Got ${results.length} results")
 
-        printer.results(rootFile, results)
+        printer.results(env.rootFile, results)
 
-        printer.info("Finished executing tool")
+        printer.debug("Finished executing tool")
         halt(0)
 
       case Failure(error) =>
