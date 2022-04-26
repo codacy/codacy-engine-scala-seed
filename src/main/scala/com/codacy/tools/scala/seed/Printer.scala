@@ -3,7 +3,6 @@ package com.codacy.tools.scala.seed
 import java.io.PrintStream
 import java.nio.file.Path
 
-import com.codacy.plugins.api
 import com.codacy.plugins.api.Source
 import com.codacy.plugins.api.results.Result
 import com.codacy.tools.scala.seed.utils.FileHelper
