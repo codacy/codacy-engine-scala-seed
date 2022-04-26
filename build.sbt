@@ -1,4 +1,3 @@
-val scala211 = "2.11.12"
 val scala212 = "2.12.14"
 val scala213 = "2.13.6"
 
@@ -6,7 +5,7 @@ val specs2Version = "4.8.3"
 
 ThisBuild / organization := "com.codacy"
 ThisBuild / scalaVersion := scala212
-ThisBuild / crossScalaVersions := Seq(scala211, scala212, scala213)
+ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 
 name := "codacy-engine-scala-seed"
 
