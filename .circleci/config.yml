@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  codacy: codacy/base@2.7.0
+  codacy: codacy/base@6.3.1
 
 workflows:
   version: 2
@@ -10,16 +10,21 @@ workflows:
       - codacy/checkout_and_version:
           write_sbt_version: true
       - codacy/sbt:
-          name: compile_test
-          cmd: |
-            sbt -mem 2048 "set scalafmtUseIvy in ThisBuild := false;
-                 scalafmt::test;
-                 test:scalafmt::test;
-                 sbt:scalafmt::test;
-                 +test;
-                 coverage;
-                 coverageReport"
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report --skip
+          name: compile_and_test
+          steps:
+            - run:
+                name: Check Scalafmt Sbt
+                command: sbt scalafmtSbtCheck
+            - run:
+                name: Check Scalafmt Sources
+                command: sbt scalafmtCheckAll
+            - run:
+                name: Compile
+                command: sbt +Test/compile
+            - run:
+                name: Test
+                command: sbt +test
+          use_sbt_native_client: true
           persist_to_workspace: true
           requires:
             - codacy/checkout_and_version
@@ -29,7 +34,7 @@ workflows:
           cmd: |
             sbt retrieveGPGKeys +publishSigned sonatypeBundleRelease
           requires:
-            - compile_test
+            - compile_and_test
           filters:
             branches:
               only:

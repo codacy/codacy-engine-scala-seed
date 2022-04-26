@@ -8,4 +8,5 @@
 /target/
 .metals
 .bloop
+/.bsp
 /.codacy-coverage/
