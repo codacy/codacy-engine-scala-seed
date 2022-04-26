@@ -96,6 +96,9 @@ package object api {
   implicit lazy val resultMessageFormat: Format[Result.Message] =
     Format(Reads.StringReads.map(Result.Message), Writes((v: Result.Message) => Json.toJson(v.value)))
 
+  implicit lazy val resultSuggestionFormat: Format[Result.Suggestion] =
+    Format(Reads.StringReads.map(Result.Suggestion), Writes((v: Result.Suggestion) => Json.toJson(v.value)))
+
   implicit lazy val resultLineFormat: Format[Source.Line] =
     Format(Reads.IntReads.map(Source.Line), Writes((v: Source.Line) => Json.toJson(v.value)))
 
@@ -164,10 +167,14 @@ package object api {
   implicit lazy val parameterDescriptionFormat: Format[Parameter.Description] = Json.format[Parameter.Description]
   implicit lazy val patternDescriptionFormat: Format[Pattern.Description] = Json.format[Pattern.Description]
 
+  implicit lazy val resultIssueWrites: Writes[Result.Issue] = Json.writes[Result.Issue]
+  implicit lazy val resultExtendedIssueWrites: Writes[Result.ExtendedIssue] = Json.writes[Result.ExtendedIssue]
+  implicit lazy val resultFileErrorWrites: Writes[Result.FileError] = Json.writes[Result.FileError]
+
   implicit lazy val resultWrites: Writes[Result] = Writes[Result]((_: Result) match {
-    case r: Result.Issue => Json.writes[Result.Issue].writes(r)
-    case r: Result.ExtendedIssue => Json.writes[Result.ExtendedIssue].writes(r)
-    case e: Result.FileError => Json.writes[Result.FileError].writes(e)
+    case r: Result.Issue => resultIssueWrites.writes(r)
+    case r: Result.ExtendedIssue => resultExtendedIssueWrites.writes(r)
+    case e: Result.FileError => resultFileErrorWrites.writes(e)
   })
 
   implicit lazy val toolCodacyConfigurationFormat: Format[Tool.CodacyConfiguration] =
