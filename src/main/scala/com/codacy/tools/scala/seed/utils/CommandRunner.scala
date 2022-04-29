@@ -2,7 +2,6 @@ package com.codacy.tools.scala.seed.utils
 
 import java.io._
 import java.nio.charset.CodingErrorAction
-
 import scala.collection.mutable
 import scala.io.{Codec, Source}
 import scala.sys.process._
@@ -18,6 +17,14 @@ object CommandRunner {
 
     val pio = new ProcessIO(_.close(), readStream(stdout), readStream(stderr))
 
+    def printError(): Unit = {
+      System.err.println(s"Command `${cmd.mkString(" ")}` failed!")
+      System.err.println("STDOUT")
+      stdout.foreach(System.err.println)
+      System.err.println("STDERR")
+      stderr.foreach(System.err.println)
+    }
+
     Try(Process(cmd, dir).run(pio)) match {
       case Success(process) =>
         Try(process.exitValue()) match {
@@ -26,10 +33,12 @@ object CommandRunner {
 
           case Failure(e) =>
             process.destroy()
+            printError()
             Left(e)
         }
 
       case Failure(e) =>
+        printError()
         Left(e)
     }
   }
