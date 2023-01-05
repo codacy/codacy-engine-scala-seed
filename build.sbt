@@ -11,8 +11,7 @@ name := "codacy-engine-scala-seed"
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.9.2",
-  "com.codacy" %% "codacy-plugins-api" % "5.3.2",
-  "com.github.pathikrit" %% "better-files" % "3.8.0"
+  "com.codacy" %% "codacy-plugins-api" % "5.3.2"
 ) ++ Seq("specs2-core", "specs2-mock").map("org.specs2" %% _ % specs2Version % Test)
 
 scalacOptions := Seq()

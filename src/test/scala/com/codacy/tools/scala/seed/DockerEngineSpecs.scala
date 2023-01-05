@@ -1,8 +1,7 @@
 package com.codacy.tools.scala.seed
 
-import java.io.{ByteArrayOutputStream, PrintStream}
+import java.io.{ByteArrayOutputStream, File, PrintStream}
 
-import better.files.File
 import com.codacy.plugins.api.results.Result.FileError
 import com.codacy.plugins.api.results.{Pattern, Tool}
 import com.codacy.plugins.api.{ErrorMessage, Options, Source}
