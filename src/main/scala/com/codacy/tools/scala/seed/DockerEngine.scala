@@ -23,8 +23,8 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
     initTimeout(timeout)
 
     val result = (for {
-      specification <- dockerEnvironment.specification(specificationFile)
-      configurations <- dockerEnvironment.configurations(configFile)
+      specification <- dockerEnvironment.specification(specificationFile.toFile)
+      configurations <- dockerEnvironment.configurations(configFile.toFile)
     } yield {
       val toolConfiguration = getToolConfiguration(specification, configurations)
       val files = getFiles(configurations)

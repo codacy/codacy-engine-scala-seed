@@ -2,8 +2,8 @@ package com.codacy.tools.scala.seed.utils
 
 import java.nio.file.Path
 
-import better.files.File
 import org.specs2.mutable.Specification
+import java.nio.file.Files
 
 class FileHelperTest extends Specification {
 
@@ -13,8 +13,8 @@ class FileHelperTest extends Specification {
       "create a temporary file and write the content to it" >> {
         val file = FileHelper.createTmpFile("content", "prefix", ".ext")
 
-        File(file).name must startWith("prefix").and(endWith(".ext"))
-        File(file).contentAsString must beEqualTo("content")
+        file.getFileName.toString must startWith("prefix").and(endWith(".ext"))
+        new String(Files.readAllBytes(file)) must beEqualTo("content")
       }
 
       "stripAbsolutePrefix" >> {
@@ -43,49 +43,60 @@ class FileHelperTest extends Specification {
 
       "findConfigurationFile" >> {
         "find the configuration file closest to the root" >> {
-          (for {
-            root <- File.temporaryDirectory()
-          } yield {
-            root./("test.json").write("content")
+          val root = Files.createTempDirectory("")
+          try {
+            Files.write(root.resolve("test.json"), "content".getBytes("UTF-8"))
 
             val configFile: Option[Path] =
-              FileHelper.findConfigurationFile(root.path, configFileNames = Set("test.json"))
+              FileHelper.findConfigurationFile(root, configFileNames = Set("test.json"))
 
-            configFile must beEqualTo(Option(root./("test.json").path))
-          }).get()
+            configFile must beEqualTo(Option(root.resolve("test.json")))
+          } finally {
+            deleteRecursively(root)
+          }
         }
 
         "find the configuration file closest to the root with two possible configuration file names" >> {
-          (for {
-            root <- File.temporaryDirectory()
-          } yield {
-            root./("test2.json").write("content")
+          val root = Files.createTempDirectory("")
+          try {
+            Files.write(root.resolve("test2.json"), "content".getBytes("UTF-8"))
 
             val configFile: Option[Path] =
-              FileHelper.findConfigurationFile(root.path, configFileNames = Set("test.json", "test2.json"))
+              FileHelper.findConfigurationFile(root, configFileNames = Set("test.json", "test2.json"))
 
-            configFile must beEqualTo(Option(root./("test2.json").path))
-          }).get()
+            configFile must beEqualTo(Option(root.resolve("test2.json")))
+          } finally {
+            deleteRecursively(root)
+          }
         }
 
         "not find the configuration file closest to the root if its deeper then 5 in the path" >> {
-          (for {
-            root <- File.temporaryDirectory()
-          } yield {
-            val subDirectory: File = root / "one" / "two" / "three" / "four" / "five"
-            subDirectory.createDirectories()
-            subDirectory./("test.json").write("content")
+          val root = Files.createTempDirectory("")
+          try {
+            val subDirectory = root.resolve("one").resolve("two").resolve("three").resolve("four").resolve("five")
+            Files.createDirectories(subDirectory)
+            Files.write(subDirectory.resolve("test.json"), "content".getBytes("UTF-8"))
 
             val configFile: Option[Path] =
-              FileHelper.findConfigurationFile(root.path, configFileNames = Set("test.json"))
+              FileHelper.findConfigurationFile(root, configFileNames = Set("test.json"))
 
             configFile must beEqualTo(Option.empty[Path])
-          }).get()
+          } finally {
+            deleteRecursively(root)
+          }
         }
       }
 
     }
 
+  }
+
+  def deleteRecursively(directory: Path): Unit = {
+    Files.list(directory).forEach { file =>
+      if (Files.isDirectory(file)) deleteRecursively(file)
+      else Files.delete(file)
+    }
+    Files.delete(directory)
   }
 
 }

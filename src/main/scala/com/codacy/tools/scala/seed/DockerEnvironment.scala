@@ -1,9 +1,9 @@
 package com.codacy.tools.scala.seed
 
-import java.nio.file.{Path, Paths}
+import java.io.File
+import java.nio.file.{Files, Path, Paths}
 import scala.concurrent.duration._
 import scala.util.{Success, Try}
-import better.files._
 import play.api.libs.json.Json
 import com.codacy.plugins.api._
 import com.codacy.plugins.api.results.Tool
@@ -26,10 +26,10 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
   val debug: Boolean =
     variables.get("DEBUG").flatMap(debugStrValue => Try(debugStrValue.toBoolean).toOption).getOrElse(false)
 
-  def configurations(configFile: File = defaultConfigFile): Try[Option[Tool.CodacyConfiguration]] = {
+  def configurations(configFile: File = defaultConfigFile.toFile): Try[Option[Tool.CodacyConfiguration]] = {
     if (configFile.exists) {
       for {
-        content <- Try(configFile.byteArray)
+        content <- Try(Files.readAllBytes(configFile.toPath))
         json <- Try(Json.parse(content))
         cfg <- json.validate[Tool.CodacyConfiguration].asTry
       } yield Some(cfg)
@@ -38,9 +38,9 @@ class DockerEnvironment(variables: Map[String, String] = sys.env) {
     }
   }
 
-  def specification(specificationPath: File = defaultSpecificationFile): Try[Tool.Specification] = {
+  def specification(specificationPath: File = defaultSpecificationFile.toFile): Try[Tool.Specification] = {
     for {
-      content <- Try(specificationPath.byteArray)
+      content <- Try(Files.readAllBytes(specificationPath.toPath))
       json <- Try(Json.parse(content))
       spec <- json.validate[Tool.Specification].asTry
     } yield spec
