@@ -1,21 +1,16 @@
 package com.codacy.tools.scala.seed.utils
 
 import scala.concurrent.duration._
-import org.specs2.mutable.Specification
 
-class TimeoutHelperTest extends Specification {
+class TimeoutHelperTest extends munit.FunSuite {
 
-  "TimeoutHelper" >> {
-    "parseTimeout" >> {
-      "parse seconds integers" >> {
-        val result = TimeoutHelper.parseTimeout("60")
-        result must beEqualTo(Some(60.seconds))
-      }
-      "return None in case of strings that are not integers" >> {
-        TimeoutHelper.parseTimeout("") must beEqualTo(None)
+  test("parseTimeout: parse seconds integers") {
+    val result = TimeoutHelper.parseTimeout("60")
+    assertEquals(result, Some(60.seconds))
+  }
+  test("parseTimeout: return None in case of strings that are not integers") {
+    assertEquals(TimeoutHelper.parseTimeout(""), None)
 
-        TimeoutHelper.parseTimeout("foo") must beEqualTo(None)
-      }
-    }
+    assertEquals(TimeoutHelper.parseTimeout("foo"), None)
   }
 }

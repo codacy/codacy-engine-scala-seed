@@ -1,8 +1,6 @@
 val scala212 = "2.12.14"
 val scala213 = "2.13.6"
 
-val specs2Version = "4.8.3"
-
 ThisBuild / organization := "com.codacy"
 ThisBuild / scalaVersion := scala212
 ThisBuild / crossScalaVersions := Seq(scala212, scala213)
@@ -11,8 +9,9 @@ name := "codacy-engine-scala-seed"
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.9.2",
-  "com.codacy" %% "codacy-plugins-api" % "8.1.1"
-) ++ Seq("specs2-core", "specs2-mock").map("org.specs2" %% _ % specs2Version % Test)
+  "com.codacy" %% "codacy-plugins-api" % "8.1.1",
+  "org.scalameta" %% "munit" % "1.0.0-M7" % Test
+)
 
 scalacOptions := Seq()
 
