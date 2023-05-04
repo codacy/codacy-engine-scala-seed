@@ -16,7 +16,7 @@ class DelayableTest extends munit.FunSuite with Delayable {
   }
 
   test("mustn't throw exception") {
-    val f = delay(1.seconds) { }
+    val f = delay(1.seconds) {}
 
     Await.result(f, Duration.Inf)
   }

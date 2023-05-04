@@ -88,45 +88,46 @@ package object api {
     )
 
   implicit lazy val patternIdFormat: Format[Pattern.Id] =
-    Format(Reads.StringReads.map(Pattern.Id), Writes((v: Pattern.Id) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Pattern.Id.apply), Writes((v: Pattern.Id) => Json.toJson(v.value)))
 
   implicit lazy val errorMessageFormat: Format[ErrorMessage] =
-    Format(Reads.StringReads.map(ErrorMessage), Writes((v: ErrorMessage) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(ErrorMessage.apply), Writes((v: ErrorMessage) => Json.toJson(v.value)))
 
   implicit lazy val resultMessageFormat: Format[Result.Message] =
-    Format(Reads.StringReads.map(Result.Message), Writes((v: Result.Message) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Result.Message.apply), Writes((v: Result.Message) => Json.toJson(v.value)))
 
   implicit lazy val resultSuggestionFormat: Format[Result.Suggestion] =
-    Format(Reads.StringReads.map(Result.Suggestion), Writes((v: Result.Suggestion) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Result.Suggestion.apply), Writes((v: Result.Suggestion) => Json.toJson(v.value)))
 
   implicit lazy val resultLineFormat: Format[Source.Line] =
-    Format(Reads.IntReads.map(Source.Line), Writes((v: Source.Line) => Json.toJson(v.value)))
+    Format(Reads.IntReads.map(Source.Line.apply), Writes((v: Source.Line) => Json.toJson(v.value)))
 
   implicit lazy val parameterNameFormat: Format[Parameter.Name] =
-    Format(Reads.StringReads.map(Parameter.Name), Writes((v: Parameter.Name) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Parameter.Name.apply), Writes((v: Parameter.Name) => Json.toJson(v.value)))
 
   implicit lazy val toolNameFormat: Format[Tool.Name] =
-    Format(Reads.StringReads.map(Tool.Name), Writes((v: Tool.Name) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Tool.Name.apply), Writes((v: Tool.Name) => Json.toJson(v.value)))
 
   implicit lazy val toolVersionFormat: Format[Tool.Version] =
-    Format(Reads.StringReads.map(Tool.Version), Writes((v: Tool.Version) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Tool.Version.apply), Writes((v: Tool.Version) => Json.toJson(v.value)))
 
   implicit lazy val sourceFileFormat: Format[Source.File] =
-    Format(Reads.StringReads.map(Source.File), Writes((v: Source.File) => Json.toJson(v.path)))
+    Format(Reads.StringReads.map(Source.File.apply), Writes((v: Source.File) => Json.toJson(v.path)))
 
   implicit lazy val parameterDescriptionTextFormat: Format[Parameter.DescriptionText] = Format(
-    Reads.StringReads.map(Parameter.DescriptionText),
+    Reads.StringReads.map(Parameter.DescriptionText.apply),
     Writes((v: Parameter.DescriptionText) => Json.toJson(v.value))
   )
 
   implicit lazy val patternDescriptionTextFormat: Format[Pattern.DescriptionText] =
-    Format(Reads.StringReads.map(Pattern.DescriptionText), Writes((v: Pattern.DescriptionText) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Pattern.DescriptionText.apply),
+           Writes((v: Pattern.DescriptionText) => Json.toJson(v.value)))
 
   implicit lazy val patternTitleFormat: Format[Pattern.Title] =
-    Format(Reads.StringReads.map(Pattern.Title), Writes((v: Pattern.Title) => Json.toJson(v.value)))
+    Format(Reads.StringReads.map(Pattern.Title.apply), Writes((v: Pattern.Title) => Json.toJson(v.value)))
 
   implicit lazy val patternTimeToFixFormat: Format[Pattern.TimeToFix] =
-    Format(Reads.IntReads.map(Pattern.TimeToFix), Writes((v: Pattern.TimeToFix) => Json.toJson(v.value)))
+    Format(Reads.IntReads.map(Pattern.TimeToFix.apply), Writes((v: Pattern.TimeToFix) => Json.toJson(v.value)))
 
   implicit lazy val parameterSpecificationFormat: Format[Parameter.Specification] = Json.format[Parameter.Specification]
   implicit lazy val parameterDefinitionFormat: Format[Parameter.Definition] = Json.format[Parameter.Definition]
@@ -151,10 +152,9 @@ package object api {
     Format[Tool.Specification](reads, writes)
   }
 
-  implicit lazy val configurationOptionsKeyFormat: Format[Options.Key] = Json.format[Options.Key]
   implicit lazy val configurationOptionsFormat: Format[Map[Options.Key, Options.Value]] =
     Format[Map[Options.Key, Options.Value]](
-      Reads { json: JsValue =>
+      Reads { (json: JsValue) =>
         JsSuccess(json.asOpt[Map[String, JsValue]].fold(Map.empty[Options.Key, Options.Value]) {
           _.map {
             case (k, v) =>
@@ -168,12 +168,10 @@ package object api {
   implicit lazy val patternDescriptionFormat: Format[Pattern.Description] = Json.format[Pattern.Description]
 
   implicit lazy val resultIssueWrites: Writes[Result.Issue] = Json.writes[Result.Issue]
-  implicit lazy val resultExtendedIssueWrites: Writes[Result.ExtendedIssue] = Json.writes[Result.ExtendedIssue]
   implicit lazy val resultFileErrorWrites: Writes[Result.FileError] = Json.writes[Result.FileError]
 
   implicit lazy val resultWrites: Writes[Result] = Writes[Result]((_: Result) match {
     case r: Result.Issue => resultIssueWrites.writes(r)
-    case r: Result.ExtendedIssue => resultExtendedIssueWrites.writes(r)
     case e: Result.FileError => resultFileErrorWrites.writes(e)
   })
 
