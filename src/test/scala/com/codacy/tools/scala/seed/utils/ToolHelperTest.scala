@@ -3,10 +3,9 @@ package com.codacy.tools.scala.seed.utils
 import com.codacy.plugins.api._
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
 import ToolHelper._
-import org.specs2.mutable.Specification
 import play.api.libs.json.{JsNumber, JsString}
 
-class ToolHelperTest extends Specification {
+class ToolHelperTest extends munit.FunSuite {
 
   val paramSpec1 = Parameter.Specification(Parameter.Name("param1"), Parameter.Value(JsNumber(2)))
   val paramSpec2 = Parameter.Specification(Parameter.Name("param2"), Parameter.Value(JsString("value2")))
@@ -33,60 +32,57 @@ class ToolHelperTest extends Specification {
   val genericConf: Option[List[Pattern.Definition]] = Some(List(patternDef1, patternDef2))
   val genericConfNoParam: Option[List[Pattern.Definition]] = Some(List(patternDef1NoParam, patternDef2NoParam))
 
-  "ToolHelper" >> {
-    "getPatternsFromConf" >> {
-      val spec = genericSpec
-      val conf = genericConf
+  test("getPatternsFromConf") {
+    val spec = genericSpec
+    val conf = genericConf
 
-      val result = conf.withDefaultParameters(spec)
+    val result = conf.withDefaultParameters(spec)
 
-      result must beEqualTo(conf)
-    }
+    assertEquals(result, conf)
+  }
 
-    "getPatternsNoneIfNoConf" >> {
-      val spec = genericSpec
-      val conf = None
+  test("getPatternsNoneIfNoConf") {
+    val spec = genericSpec
+    val conf = None
 
-      val result = conf.withDefaultParameters(spec)
+    val result = conf.withDefaultParameters(spec)
 
-      result must beNone
-    }
+    assertEquals(result, None)
+  }
 
-    "getPatternsEmptyIfEmptyConf" >> {
-      val spec = genericSpec
-      val conf: Option[List[Pattern.Definition]] = Some(List())
+  test("getPatternsEmptyIfEmptyConf") {
+    val spec = genericSpec
+    val conf: Option[List[Pattern.Definition]] = Some(List())
 
-      val result = conf.withDefaultParameters(spec)
+    val result = conf.withDefaultParameters(spec)
 
-      result must beEqualTo(Some(List()))
-    }
+    assertEquals(result, Some(List()))
+  }
 
-    "getParametersFromSpec" >> {
-      val spec = genericSpec
-      val conf = genericConfNoParam
+  test("getParametersFromSpec") {
+    val spec = genericSpec
+    val conf = genericConfNoParam
 
-      val expectedParamDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(2)))
-      val expectedParamDef2 = Parameter.Definition(Parameter.Name("param2"), Parameter.Value(JsString("value2")))
-      val expectedPatternDef1 = Pattern.Definition(Pattern.Id("id1"), Set(expectedParamDef1, expectedParamDef2))
-      val expectedPatternDef2 = Pattern.Definition(Pattern.Id("id2"), Set.empty)
-      val expectedResult = Some(List(expectedPatternDef1, expectedPatternDef2))
+    val expectedParamDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(2)))
+    val expectedParamDef2 = Parameter.Definition(Parameter.Name("param2"), Parameter.Value(JsString("value2")))
+    val expectedPatternDef1 = Pattern.Definition(Pattern.Id("id1"), Set(expectedParamDef1, expectedParamDef2))
+    val expectedPatternDef2 = Pattern.Definition(Pattern.Id("id2"), Set.empty)
+    val expectedResult = Some(List(expectedPatternDef1, expectedPatternDef2))
 
-      val result = conf.withDefaultParameters(spec)
+    val result = conf.withDefaultParameters(spec)
 
-      result must beEqualTo(expectedResult)
-    }
+    assertEquals(result, expectedResult)
+  }
 
-    "set the values of parameters not defined in the configuration to the default" >> {
-      val spec = genericSpec.copy(patterns = Set(patternSpecification1))
+  test("set the values of parameters not defined in the configuration to the default") {
+    val spec = genericSpec.copy(patterns = Set(patternSpecification1))
 
-      val confPattern = patternDef1.copy(parameters = Set(paramDef1))
-      val conf = Some(List(confPattern))
+    val confPattern = patternDef1.copy(parameters = Set(paramDef1))
+    val conf = Some(List(confPattern))
 
-      val result = conf.withDefaultParameters(spec)
+    val result = conf.withDefaultParameters(spec)
 
-      result must beEqualTo(
-        Some(List(confPattern.copy(parameters = Set(paramDef1, paramDef2.copy(value = paramSpec2.default)))))
-      )
-    }
+    assertEquals(result,
+                 Some(List(confPattern.copy(parameters = Set(paramDef1, paramDef2.copy(value = paramSpec2.default))))))
   }
 }

@@ -1,31 +1,29 @@
 package com.codacy.plugins.api
 
 import com.codacy.plugins.api.results.{Pattern, Result, Tool}
-import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
-class FormatSpecs extends Specification {
-  "Format" >> {
-    "allow a pattern specification with no `enabled`, `parameters` nor `languages`" >> {
-      val patternId = "a-pattern-id"
-      val level = Result.Level.Info
-      val category = Pattern.Category.CodeStyle
+class FormatSpecs extends munit.FunSuite {
+  test("allow a pattern specification with no `enabled`, `parameters` nor `languages`") {
+    val patternId = "a-pattern-id"
+    val level = Result.Level.Info
+    val category = Pattern.Category.CodeStyle
 
-      val json = s"""{"patternId": "$patternId", "level": "$level", "category": "$category"}"""
+    val json = s"""{"patternId": "$patternId", "level": "$level", "category": "$category"}"""
 
-      val result = Json.parse(json).as[Pattern.Specification]
-      val expectedResult =
-        Pattern.Specification(Pattern.Id(patternId), level, category, None, Set.empty, Set.empty, false)
+    val result = Json.parse(json).as[Pattern.Specification]
+    val expectedResult =
+      Pattern.Specification(Pattern.Id(patternId), level, category, None, Set.empty, Set.empty, false)
 
-      result shouldEqual expectedResult
-    }
-    "allow a pattern definition with no `parameters` in pattern objects in `patterns`" >> {
-      val name = "a-tool"
-      val patternId = "a-pattern-id"
-      val file = "a-file"
+    assertEquals(result, expectedResult)
+  }
+  test("allow a pattern definition with no `parameters` in pattern objects in `patterns`") {
+    val name = "a-tool"
+    val patternId = "a-pattern-id"
+    val file = "a-file"
 
-      val json =
-        s"""{
+    val json =
+      s"""{
            |  "tools": [
            |    {
            |      "name": "$name",
@@ -39,15 +37,14 @@ class FormatSpecs extends Specification {
            |  "files": ["$file"]
            |}""".stripMargin
 
-      val result = Json.parse(json).as[Tool.CodacyConfiguration]
-      val expectedResult =
-        Tool.CodacyConfiguration(
-          Set(Tool.Configuration(Tool.Name(name), Some(List(Pattern.Definition(Pattern.Id(patternId)))))),
-          files = Some(Set(Source.File(file))),
-          options = None
-        )
+    val result = Json.parse(json).as[Tool.CodacyConfiguration]
+    val expectedResult =
+      Tool.CodacyConfiguration(
+        Set(Tool.Configuration(Tool.Name(name), Some(List(Pattern.Definition(Pattern.Id(patternId)))))),
+        files = Some(Set(Source.File(file))),
+        options = None
+      )
 
-      result shouldEqual expectedResult
-    }
+    assertEquals(result, expectedResult)
   }
 }
