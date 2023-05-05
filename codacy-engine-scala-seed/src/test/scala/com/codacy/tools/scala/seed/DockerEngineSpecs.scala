@@ -3,7 +3,7 @@ package com.codacy.tools.scala.seed
 import java.io.{ByteArrayOutputStream, File, PrintStream}
 
 import com.codacy.plugins.api.results.{Pattern, Result, Tool}
-import com.codacy.plugins.api.{ErrorMessage, Options, Source}
+import com.codacy.plugins.api._
 import com.codacy.tools.scala.seed.utils.FileHelper
 import play.api.libs.json.Json
 

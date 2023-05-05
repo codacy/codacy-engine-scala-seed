@@ -3,7 +3,7 @@ package com.codacy.tools.scala.seed
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import com.codacy.plugins.api.Source
+import com.codacy.plugins.api._
 import com.codacy.plugins.api.results.Tool
 import play.api.libs.json.Json
 import scala.util.Success

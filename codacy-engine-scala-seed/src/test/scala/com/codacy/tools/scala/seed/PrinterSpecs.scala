@@ -2,7 +2,7 @@ package com.codacy.tools.scala.seed
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 
-import com.codacy.plugins.api.Source
+import com.codacy.plugins.api._
 import com.codacy.plugins.api.results.Result.Issue
 import com.codacy.plugins.api.results.{Pattern, Result}
 import com.codacy.tools.scala.seed.utils.FileHelper
