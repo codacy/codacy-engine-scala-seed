@@ -8,7 +8,6 @@ ThisBuild / crossScalaVersions := Seq(scala212, scala213, scala3)
 
 lazy val `codacy-engine-scala-seed` =
   crossProject(JVMPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
     .settings(name := "codacy-engine-scala-seed",
               libraryDependencies ++= Seq("com.typesafe.play" %%% "play-json" % "2.10.0-RC8",
                                           "com.codacy" %%% "codacy-plugins-api" % "7.2.0",

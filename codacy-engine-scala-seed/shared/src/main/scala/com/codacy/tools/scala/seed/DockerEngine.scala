@@ -17,10 +17,11 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
   timeout: FiniteDuration = dockerEnvironment.defaultTimeout,
   printer: Printer = new Printer(dockerEnvironment = dockerEnvironment)
 ) extends Delayable
-    with Haltable {
+    with Haltable
+    with PlatformSpecific.DockerEngine {
 
   def main(args: Array[String]): Unit = {
-    initTimeout(timeout)
+    initTimeout(timeout, printer)
 
     val result = (for {
       specification <- dockerEnvironment.specification(specificationFile.toFile)
@@ -56,11 +57,6 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
         Failure(t)
     }
     result
-  }
-
-  private def initTimeout(duration: FiniteDuration): Future[Unit] = {
-    printer.info("Starting timeout")
-    delay(duration)(halt(2))
   }
 
   private def getToolConfiguration(
