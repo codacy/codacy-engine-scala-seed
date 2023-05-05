@@ -26,6 +26,9 @@ workflows:
                 name: Compile
                 command: sbt +Test/compile
             - run:
+                name: Install Clang for Scala Native
+                command: sudo apt-get update && sudo apt-get install clang
+            - run:
                 name: Test
                 command: sbt +test
           use_sbt_native_client: true
