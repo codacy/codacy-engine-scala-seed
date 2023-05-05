@@ -11,6 +11,10 @@ workflows:
           write_sbt_version: true
       - codacy/sbt:
           name: compile_and_test
+          steps_before_sbt:
+            - run:
+                name: Override OpenJdk (java8 -> java11)
+                command: sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
           steps:
             - run:
                 name: Check Scalafmt Sbt
@@ -31,8 +35,14 @@ workflows:
       - codacy/sbt:
           name: publish_sonatype
           context: CodacyAWS
-          cmd: |
-            sbt retrieveGPGKeys +publishSigned sonatypeBundleRelease
+          steps_before_sbt:
+            - run:
+                name: Override OpenJdk (java8 -> java11)
+                command: sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+          steps:
+            - run:
+                name: Publish to Sonatype
+                command: sbt retrieveGPGKeys +publishSigned sonatypeBundleRelease
           requires:
             - compile_and_test
           filters:
