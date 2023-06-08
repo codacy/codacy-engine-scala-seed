@@ -1,11 +1,7 @@
-/target
+target
 /.idea
 /RUNNING_PID
 /logs/
-/project/*-shim.sbt
-/project/project/
-/project/target/
-/target/
 .metals
 .bloop
 /.bsp
