@@ -30,13 +30,6 @@ class Printer(infoStream: PrintStream = Console.out,
         val relativeIssue = issue.copy(file = Source.File(relativize(rootFile, issue.file.path)))
         logResult(relativeIssue)
 
-      case extendedIssue: Result.ExtendedIssue =>
-        val relativeIssue = extendedIssue.copy(
-          location =
-            extendedIssue.location.copy(path = Source.File(relativize(rootFile, extendedIssue.location.path.path)))
-        )
-        logResult(relativeIssue)
-
       case error: Result.FileError =>
         val relativeIssue = error.copy(file = Source.File(relativize(rootFile, error.file.path)))
         logResult(relativeIssue)

@@ -168,12 +168,10 @@ package object api {
   implicit lazy val patternDescriptionFormat: Format[Pattern.Description] = Json.format[Pattern.Description]
 
   implicit lazy val resultIssueWrites: Writes[Result.Issue] = Json.writes[Result.Issue]
-  implicit lazy val resultExtendedIssueWrites: Writes[Result.ExtendedIssue] = Json.writes[Result.ExtendedIssue]
   implicit lazy val resultFileErrorWrites: Writes[Result.FileError] = Json.writes[Result.FileError]
 
   implicit lazy val resultWrites: Writes[Result] = Writes[Result]((_: Result) match {
     case r: Result.Issue => resultIssueWrites.writes(r)
-    case r: Result.ExtendedIssue => resultExtendedIssueWrites.writes(r)
     case e: Result.FileError => resultFileErrorWrites.writes(e)
   })
 
