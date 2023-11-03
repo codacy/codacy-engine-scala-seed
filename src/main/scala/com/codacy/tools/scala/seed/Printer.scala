@@ -27,11 +27,11 @@ class Printer(infoStream: PrintStream = Console.out,
   def results(rootFile: Path, results: List[Result]): Unit = {
     results.foreach {
       case issue: Result.Issue =>
-        val relativeIssue = issue.copy(file = Source.File(relativize(rootFile, issue.file.path)))
+        val relativeIssue = issue.copy(filename = Source.File(relativize(rootFile, issue.filename.path)))
         logResult(relativeIssue)
 
       case error: Result.FileError =>
-        val relativeIssue = error.copy(file = Source.File(relativize(rootFile, error.file.path)))
+        val relativeIssue = error.copy(filename = Source.File(relativize(rootFile, error.filename.path)))
         logResult(relativeIssue)
     }
   }
