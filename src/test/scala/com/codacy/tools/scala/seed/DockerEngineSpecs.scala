@@ -69,7 +69,7 @@ class DockerEngineSpecs extends Specification with Mockito {
       Json.parse(outContent.toString) must beEqualTo(
         Json.toJson(
           result.copy(
-            file = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString))
+            filename = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString))
           )
         )
       )

@@ -28,7 +28,7 @@ class PrinterSpecs extends Specification {
 
       //then
       Json.parse(outContent.toString) must beEqualTo(
-        Json.toJson(result.copy(file = Source.File(FileHelper.stripAbsolutePrefix(fileName, sourcePath.toString))))
+        Json.toJson(result.copy(filename = Source.File(FileHelper.stripAbsolutePrefix(fileName, sourcePath.toString))))
       )
     }
   }
