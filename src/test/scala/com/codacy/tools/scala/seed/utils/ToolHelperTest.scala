@@ -15,10 +15,11 @@ class ToolHelperTest extends Specification {
                                                     Result.Level.Warn,
                                                     Pattern.Category.CodeStyle,
                                                     None,
+                                                    None,
                                                     Set(paramSpec1, paramSpec2))
 
   val patternSpecification2 =
-    Pattern.Specification(Pattern.Id("id2"), Result.Level.Warn, Pattern.Category.CodeStyle, None, Set.empty)
+    Pattern.Specification(Pattern.Id("id2"), Result.Level.Warn, Pattern.Category.CodeStyle, None, None, Set.empty)
   val patternsSpec = Set(patternSpecification1, patternSpecification2)
 
   val paramDef1 = Parameter.Definition(Parameter.Name("param1"), Parameter.Value(JsNumber(33)))

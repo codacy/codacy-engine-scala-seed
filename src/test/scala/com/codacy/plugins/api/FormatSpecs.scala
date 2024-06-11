@@ -15,7 +15,7 @@ class FormatSpecs extends Specification {
 
       val result = Json.parse(json).as[Pattern.Specification]
       val expectedResult =
-        Pattern.Specification(Pattern.Id(patternId), level, category, None, Set.empty, Set.empty, false)
+        Pattern.Specification(Pattern.Id(patternId), level, category, None, None, Set.empty, Set.empty, false)
 
       result shouldEqual expectedResult
     }
