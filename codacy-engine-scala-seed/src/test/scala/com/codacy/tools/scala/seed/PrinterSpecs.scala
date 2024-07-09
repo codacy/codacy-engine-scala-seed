@@ -26,7 +26,7 @@ class PrinterSpecs extends munit.FunSuite {
     //then
     assertEquals(
       Json.parse(outContent.toString),
-      Json.toJson(result.copy(file = Source.File(FileHelper.stripAbsolutePrefix(fileName, sourcePath.toString))))
+      Json.toJson(result.copy(filename = Source.File(FileHelper.stripAbsolutePrefix(fileName, sourcePath.toString))))
     )
   }
 }

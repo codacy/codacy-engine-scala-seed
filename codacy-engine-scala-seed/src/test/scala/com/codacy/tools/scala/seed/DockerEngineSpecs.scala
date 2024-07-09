@@ -72,7 +72,7 @@ class DockerEngineSpecs extends munit.FunSuite {
     val outContentParsed = Json.parse(outContent.toString)
     val expected = Json.toJson(
       result
-        .copy(file = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString)))
+        .copy(filename = Source.File(FileHelper.stripAbsolutePrefix(fileName, dockerEnvironment.defaultRootFile.toString)))
     )
     assertEquals(outContentParsed, expected)
     assertEquals(dockerEngine.haltCalls(0), 1)

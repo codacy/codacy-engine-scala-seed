@@ -13,7 +13,7 @@ class FormatSpecs extends munit.FunSuite {
 
     val result = Json.parse(json).as[Pattern.Specification]
     val expectedResult =
-      Pattern.Specification(Pattern.Id(patternId), level, category, None, Set.empty, Set.empty, false)
+      Pattern.Specification(Pattern.Id(patternId), level, category, None, None, Set.empty, Set.empty, false)
 
     assertEquals(result, expectedResult)
   }
