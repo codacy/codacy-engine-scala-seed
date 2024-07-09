@@ -137,6 +137,9 @@ package object api {
   implicit lazy val patternSubCategoryFormat: Format[Pattern.Subcategory] =
     Json.formatEnum(Pattern.Subcategory)
 
+  implicit lazy val patternScanTypeFormat: Format[Pattern.ScanType] =
+    Json.formatEnum(Pattern.ScanType)
+
   implicit lazy val patternSpecificationFormat: Format[Pattern.Specification] =
     Json.using[Json.WithDefaultValues].format[Pattern.Specification]
 
