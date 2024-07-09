@@ -1,19 +1,21 @@
-val scala212 = "2.12.17"
-val scala213 = "2.13.10"
-val scala3 = "3.3.0-RC5"
+val scala212 = "2.12.14"
+val scala213 = "2.13.14"
+val scala3 = "3.3.3"
 
 ThisBuild / organization := "com.codacy"
-ThisBuild / scalaVersion := scala212
+ThisBuild / scalaVersion := scala213
 ThisBuild / crossScalaVersions := Seq(scala212, scala213, scala3)
 
 lazy val `codacy-engine-scala-seed` =
   crossProject(JVMPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("codacy-engine-scala-seed"))
     .settings(name := "codacy-engine-scala-seed",
-              libraryDependencies ++= Seq("com.typesafe.play" %%% "play-json" % "2.10.0-RC8",
-                                          "com.codacy" %%% "codacy-plugins-api" % "7.2.0",
-                                          "org.scalameta" %%% "munit" % "1.0.0-M7" % Test),
+              libraryDependencies ++= Seq("org.playframework" %%% "play-json" % "3.1.0-M1",
+                                          "com.codacy" %%% "codacy-plugins-api" % "8.1.7",
+                                          "org.scalameta" %%% "munit" % "1.0.0" % Test),
               scalacOptions := Seq(),
-              // HACK: This setting is not picked up properly from the plugin
+// HACK: This setting is not picked up properly from the plugin
               pgpPassphrase := Option(System.getenv("SONATYPE_GPG_PASSPHRASE")).map(_.toCharArray),
               description := "Library to develop Codacy tools",
               scmInfo := Some(

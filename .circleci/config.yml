@@ -1,7 +1,11 @@
 version: 2.1
 
 orbs:
+<<<<<<< Updated upstream
   codacy: codacy/base@10.3.0
+=======
+  codacy: codacy/base@12.1.1
+>>>>>>> Stashed changes
 
 workflows:
   version: 2
