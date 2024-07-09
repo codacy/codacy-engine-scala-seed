@@ -13,8 +13,8 @@ workflows:
           name: compile_and_test
           steps_before_sbt:
             - run:
-                name: Override OpenJdk (java8 -> java11)
-                command: sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+                name: Override OpenJdk (java8 -> java17)
+                command: sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
           steps:
             - run:
                 name: Check Scalafmt Sbt
@@ -40,8 +40,8 @@ workflows:
           context: CodacyAWS
           steps_before_sbt:
             - run:
-                name: Override OpenJdk (java8 -> java11)
-                command: sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+                name: Override OpenJdk (java8 -> java17)
+                command: sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
           steps:
             - run:
                 name: Publish to Sonatype
