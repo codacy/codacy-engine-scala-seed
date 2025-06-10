@@ -1,5 +1,5 @@
 val scala212 = "2.12.20"
-val scala213 = "2.13.10"
+val scala213 = "2.13.11"
 
 val specs2Version = "4.8.3"
 
