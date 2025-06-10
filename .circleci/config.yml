@@ -32,7 +32,7 @@ workflows:
           name: publish_sonatype
           context: CodacyAWS
           cmd: |
-            sbt retrieveGPGKeys +publishSigned sonatypeBundleRelease
+            sbt retrieveGPGKeys +publishSigned sonatypeCentralRelease
           requires:
             - compile_and_test
           filters:
