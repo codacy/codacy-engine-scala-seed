@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  codacy: codacy/base@10.8.0
+  codacy: codacy/base@12.2.0
 
 workflows:
   version: 2
@@ -32,7 +32,7 @@ workflows:
           name: publish_sonatype
           context: CodacyAWS
           cmd: |
-            sbt retrieveGPGKeys +publishSigned sonatypeBundleRelease
+            sbt retrieveGPGKeys +publishSigned sonatypeCentralRelease
           requires:
             - compile_and_test
           filters:
