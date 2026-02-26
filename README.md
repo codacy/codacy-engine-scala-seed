@@ -32,7 +32,7 @@ Add to your SBT dependencies:
 
 #### Assumptions and Behaviour
 
-* To run the tool we provide the configuration file, `/.codacyrc`, with the language to run and optional parameters a tool might need.
+* To run the tool we provide the configuration file, `/config/codacy.json` or `/.codacyrc`, with the language to run and optional parameters a tool might need.
 * The source code to be analysed will be located in `/src`, meaning that when provided in the configuration, the file paths are relative to `/src`.
 
 * **Structure of the .codacyrc file:**

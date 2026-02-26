@@ -14,7 +14,8 @@ import com.codacy.tools.scala.seed.utils.TimeoutHelper
 class DockerEnvironment(variables: Map[String, String] = sys.env) {
 
   val defaultRootFile: Path = Paths.get("/src")
-  val defaultConfigFile: Path = Paths.get("/.codacyrc")
+  val defaultConfigFile: Path = Paths.get("/config/codacy.json")
+  val legacyConfigFile: Path = Paths.get("/.codacyrc")
   val defaultSpecificationFile: Path = Paths.get("/docs/patterns.json")
 
   val defaultTimeout: FiniteDuration =

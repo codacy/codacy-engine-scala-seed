@@ -24,8 +24,10 @@ abstract class DockerEngine(tool: Tool, dockerEnvironment: DockerEnvironment = n
 
     val result = (for {
       specification <- dockerEnvironment.specification(specificationFile.toFile)
-      configurations <- dockerEnvironment.configurations(configFile.toFile)
+      configurations1 <- dockerEnvironment.configurations(configFile.toFile)
+      configurations2 <- dockerEnvironment.configurations(dockerEnvironment.legacyConfigFile.toFile)
     } yield {
+      val configurations = configurations1.orElse(configurations2)
       val toolConfiguration = getToolConfiguration(specification, configurations)
       val files = getFiles(configurations)
       val toolOptions = getToolOptions(configurations)
