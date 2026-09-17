@@ -26,4 +26,4 @@ scmInfo := Some(
           "scm:git:git@github.com:codacy/codacy-engine-scala-seed.git")
 )
 
-publicMvnPublish
+privateMvnPublish
