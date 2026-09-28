@@ -30,6 +30,7 @@ workflows:
             - codacy/checkout_and_version
       - codacy/sbt:
           name: publish_sonatype
+          aws_profile: maven
           context: CodacyAWS
           no_output_timeout: "30m"
           cmd: sbt +publish
